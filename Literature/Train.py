@@ -25,6 +25,7 @@ import numpy as np
 from keras.utils import np_utils
 import numpy as np
 import pickle
+from collections import Counter
 
 __author__ = 'bejar'
 
@@ -88,11 +89,13 @@ if __name__ == '__main__':
 
     train_l = pickle.load(file)
     train_l = recoder.recode_labels(train_l, task=task)
+    print(Counter(train_l))
     train_l = np_utils.to_categorical(train_l, recoder.nlabels_task(task=task))
     print(train_dm.shape)
     print(train_l.shape)
     model = Sequential()
-    model.add(LSTM(256, input_shape=(train_dm.shape[1], train_dm.shape[2])))
+    model.add(LSTM(128, input_shape=(train_dm.shape[1], train_dm.shape[2]), activation='relu', return_sequences=True))
+    model.add(LSTM(128))
     model.add(Dense(recoder.nlabels_task(task=task)))
     model.add(Activation('softmax'))
 
