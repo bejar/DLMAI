@@ -94,17 +94,17 @@ if __name__ == '__main__':
     print(train_dm.shape)
     print(train_l.shape)
     model = Sequential()
-    model.add(LSTM(128, input_shape=(train_dm.shape[1], train_dm.shape[2]), activation='relu', return_sequences=True))
-    model.add(LSTM(128))
+    model.add(LSTM(32, input_shape=(train_dm.shape[1], train_dm.shape[2]), activation='relu', return_sequences=True, dropout=0.2))
+    model.add(LSTM(32, activation='relu', dropout=0.2))
     model.add(Dense(recoder.nlabels_task(task=task)))
     model.add(Activation('softmax'))
 
-    optimizer = RMSprop(lr=0.001)
+    optimizer = RMSprop(lr=0.01)
     model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 
     model.summary()
 
-    model.fit(train_dm, train_l, batch_size=128, epochs=10)
+    model.fit(train_dm, train_l, batch_size=512, epochs=25)
 
     test_dm = np.load(dpath + 'test_data.npy')
     test_dm = np.reshape(test_dm, (test_dm.shape[0], test_dm.shape[1], 1))
