@@ -94,8 +94,8 @@ if __name__ == '__main__':
     print(train_dm.shape)
     print(train_l.shape)
     model = Sequential()
-    model.add(LSTM(32, input_shape=(train_dm.shape[1], train_dm.shape[2]), activation='relu', return_sequences=True, dropout=0.2))
-    model.add(LSTM(32, activation='relu', dropout=0.2))
+    model.add(LSTM(64, input_shape=(train_dm.shape[1], train_dm.shape[2]), activation='relu', return_sequences=True, dropout=0.2))
+    model.add(LSTM(64, activation='relu', dropout=0.2))
     model.add(Dense(recoder.nlabels_task(task=task)))
     model.add(Activation('softmax'))
 

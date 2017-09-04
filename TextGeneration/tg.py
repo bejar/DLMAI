@@ -3,13 +3,14 @@ from __future__ import print_function
 from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras.layers import LSTM
-from keras.optimizers import RMSprop
+from keras.optimizers import RMSprop, SGD
 from keras.utils.data_utils import get_file
 import numpy as np
 import random
 import sys
 
-path = 'warpeace_input.txt'
+#path = 'warpeace_input.txt'
+path = 'children.txt'
 text = open(path).read().lower().decode('ascii', 'ignore')
 print('corpus length:', len(text))
 
@@ -42,11 +43,12 @@ for i, sentence in enumerate(sentences):
 # build the model: a single LSTM
 print('Build model...')
 model = Sequential()
-model.add(LSTM(128, input_shape=(maxlen, len(chars))))
+model.add(LSTM(128, input_shape=(maxlen, len(chars)), implementation=2))
 model.add(Dense(len(chars)))
 model.add(Activation('softmax'))
 
-optimizer = RMSprop(lr=0.01)
+#optimizer = RMSprop(lr=0.01)
+optimizer = SGD(lr=0.01, momentum=0.95)
 model.compile(loss='categorical_crossentropy', optimizer=optimizer)
 
 
@@ -70,7 +72,7 @@ for iteration in range(1, 60):
 
     start_index = random.randint(0, len(text) - maxlen - 1)
 
-    for diversity in [0.2, 0.5, 1.0, 1.2]:
+    for diversity in [0.2, 0.35, 0.5]:
         print()
         print('----- diversity:', diversity)
 
