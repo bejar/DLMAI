@@ -38,17 +38,16 @@ for i, sentence in enumerate(sentences):
         X[i, t, char_indices[char]] = 1
     y[i, char_indices[next_chars[i]]] = 1
 
-
-
 # build the model: a single LSTM
 print('Build model...')
 model = Sequential()
-model.add(LSTM(128, input_shape=(maxlen, len(chars)), implementation=2))
+model.add(LSTM(256, input_shape=(maxlen, len(chars)), implementation=2, dropout=0.2, return_sequences=True))
+model.add(LSTM(256, implementation=2, dropout=0.2))
 model.add(Dense(len(chars)))
 model.add(Activation('softmax'))
 
 #optimizer = RMSprop(lr=0.01)
-optimizer = SGD(lr=0.01, momentum=0.95)
+optimizer = SGD(lr=0.005, momentum=0.95)
 model.compile(loss='categorical_crossentropy', optimizer=optimizer)
 
 
@@ -67,12 +66,12 @@ for iteration in range(1, 60):
     print('-' * 50)
     print('Iteration', iteration)
     model.fit(X, y,
-              batch_size=128,
-              epochs=1)
+              batch_size=256,
+              epochs=5)
 
-    start_index = random.randint(0, len(text) - maxlen - 1)
+    start_index = 0 #random.randint(0, len(text) - maxlen - 1)
 
-    for diversity in [0.2, 0.35, 0.5]:
+    for diversity in [0.25, 0.5, 0.75]:
         print()
         print('----- diversity:', diversity)
 
@@ -82,7 +81,8 @@ for iteration in range(1, 60):
         print('----- Generating with seed: "' + sentence + '"')
         sys.stdout.write(generated)
 
-        for i in range(400):
+        nlines = 0
+        for i in range(1000):
             x = np.zeros((1, maxlen, len(chars)))
             for t, char in enumerate(sentence):
                 x[0, t, char_indices[char]] = 1.
@@ -93,7 +93,10 @@ for iteration in range(1, 60):
 
             generated += next_char
             sentence = sentence[1:] + next_char
-
+            if next_char == '\n':
+                nlines += 1
             sys.stdout.write(next_char)
             sys.stdout.flush()
+            if nlines > 15:
+                break
         print()
