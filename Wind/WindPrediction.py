@@ -17,47 +17,72 @@ WindPrediction
 
 """
 
-__author__ = 'bejar'
 
+from __future__ import print_function
 import numpy as np
-import pandas as pd
+
 from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras.layers import LSTM
 from keras.optimizers import RMSprop, SGD
+import matplotlib.pyplot as plt
 
+__author__ = 'bejar'
 
-# frame a sequence as a supervised learning problem
-def timeseries_to_supervised(data, lag=1):
-	df = pd.DataFrame(data)
-	columns = [df.shift(i) for i in range(lag, 0, -1)]
-	columns.append(df)
-	df = pd.concat(columns, axis=1)
-	df.fillna(0, inplace=True)
-	return df
+def lagged_vector(data, lag=1):
+    """
+    Returns a matrix with columns that are the steps of the lagged time series
+    Last column is the value to predict
+    :param data:
+    :param lag:
+    :return:
+    """
+    lvect = []
+    for i in range(lag):
+        lvect.append(data[i: -lag+i])
+    lvect.append(data[lag:])
+    return np.stack(lvect, axis=1)
 
 
 if __name__ == '__main__':
     wind = np.load('wind.npy')
 
+    train = lagged_vector(wind[:100000], lag=4)
+    train_x, train_y = train[:, :-1], train[:,-1]
+    train_x = np.reshape(train_x, (train_x.shape[0], train_x.shape[1], 1))
 
-    train = wind[0:1000]
-    test = wind[1000:1100]
-    X, y = train[:, 0:-1], train[:, -1]
-    X = X.reshape(X.shape[0], X.shape[1], 1)
+    test = lagged_vector(wind[100000:101000], lag=4)
+    test_x, test_y = test[:, :-1], test[:,-1]
+    test_x = np.reshape(test_x, (test_x.shape[0], test_x.shape[1], 1))
 
-    print(X.shape)
+    print(train.shape, test.shape)
 
-    neurons = 256
-    batch_size = 256
+    neurons = 64
+    batch_size = 100
 
     model = Sequential()
-    model.add(LSTM(neurons, batch_input_shape=(batch_size, X.shape[1], X.shape[2]), stateful=True))
+    model.add(LSTM(neurons, input_shape=(train_x.shape[1], 1), dropout=0.2, return_sequences=True))
+    model.add(LSTM(neurons, dropout=0.2))
     model.add(Dense(1))
-    model.compile(loss='mean_squared_error', optimizer='adam')
+    # model.add(Activation('relu'))
 
-    nb_epoch = 50
+    # optimizer = RMSprop(lr=0.001)
+    optimizer = SGD(lr=0.001, momentum=0.95)
+    model.compile(loss='mean_squared_error', optimizer=optimizer)
 
-    for i in range(nb_epoch):
-        model.fit(X, y, epochs=1, batch_size=batch_size, verbose=0, shuffle=False)
-        model.reset_states()
+    nepochs = 25
+
+
+    model.fit(train_x, train_y, batch_size=batch_size, epochs=nepochs)
+
+    train_predict = model.predict(train_x)
+    test_predict = model.predict(test_x)
+
+    score = model.evaluate(test_x, test_y, batch_size=batch_size)
+
+    print('MSE= ', score)
+
+    plt.subplot(1, 1, 1)
+    plt.plot(test_predict, color='r')
+    plt.plot(test_y, color='b')
+    plt.show()

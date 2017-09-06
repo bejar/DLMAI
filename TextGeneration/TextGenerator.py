@@ -114,20 +114,21 @@ if __name__ == '__main__':
     model.add(Activation('softmax'))
 
     #optimizer = RMSprop(lr=0.01)
-    optimizer = SGD(lr=0.005, momentum=0.95)
+    optimizer = SGD(lr=0.05, momentum=0.95)
     model.compile(loss='categorical_crossentropy', optimizer=optimizer)
 
 
     # train the model, output generated text after each iteration
+    epochs = 10
     for iteration in range(1, 60):
         print()
         print('-' * 50)
         print('Iteration', iteration)
         model.fit(X, y,
                   batch_size=256,
-                  epochs=5)
+                  epochs=epochs)
 
         start_index = 0 #random.randint(0, len(text) - maxlen - 1)
 
-        for diversity in [0.25, 0.5, 0.75]:
+        for diversity in [0.1, 0.2, 0.3, 0.4, 0.5]:
             generate_text(text[start_index: start_index + maxlen], 15)
