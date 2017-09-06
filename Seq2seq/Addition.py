@@ -187,8 +187,8 @@ for iteration in range(1, 200):
         print('Q', q[::-1] if INVERT else q)
         print('T', correct)
         if correct == guess:
-            print(colors.ok + '☑' + colors.close, end=" ")
+            print(colors.ok + '^' + colors.close, end=" ")
         else:
-            print(colors.fail + '☒' + colors.close, end=" ")
+            print(colors.fail + 'v' + colors.close, end=" ")
         print(guess)
 print('---')

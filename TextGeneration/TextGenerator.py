@@ -16,9 +16,6 @@ TextGenerator
 :Created on: 06/09/2017 9:26 
 
 """
-
-__author__ = 'bejar'
-
 from __future__ import print_function
 from keras.models import Sequential
 from keras.layers import Dense, Activation
