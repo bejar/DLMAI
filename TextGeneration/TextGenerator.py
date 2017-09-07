@@ -16,6 +16,7 @@ TextGenerator
 :Created on: 06/09/2017 9:26 
 
 """
+
 from __future__ import print_function
 from keras.models import Sequential
 from keras.layers import Dense, Activation
@@ -86,8 +87,8 @@ if __name__ == '__main__':
     indices_char = dict((i, c) for i, c in enumerate(chars))
 
     # cut the text in semi-redundant sequences of maxlen characters
-    maxlen = 80
-    step = 3
+    maxlen = 40
+    step = 5
     sentences = []
     next_chars = []
     for i in range(0, len(text) - maxlen, step):
@@ -108,8 +109,9 @@ if __name__ == '__main__':
     # Change the implementation parameter of the LSTM to 0 for CPU and 2 for GPU
     print('Build model...')
     model = Sequential()
-    model.add(LSTM(256, input_shape=(maxlen, len(chars)), implementation=2, dropout=0.2, return_sequences=True))
-    model.add(LSTM(256, implementation=2, dropout=0.2))
+    model.add(LSTM(128, input_shape=(maxlen, len(chars)), implementation=0, dropout=0.2))
+#    model.add(LSTM(256, input_shape=(maxlen, len(chars)), implementation=2, dropout=0.2, return_sequences=True))
+#    model.add(LSTM(256, implementation=2, dropout=0.2))
     model.add(Dense(len(chars)))
     model.add(Activation('softmax'))
 
@@ -119,16 +121,19 @@ if __name__ == '__main__':
 
 
     # train the model, output generated text after each iteration
-    epochs = 10
     for iteration in range(1, 60):
         print()
         print('-' * 50)
         print('Iteration', iteration)
         model.fit(X, y,
                   batch_size=256,
-                  epochs=epochs)
+                  epochs=10)
 
         start_index = 0 #random.randint(0, len(text) - maxlen - 1)
-
-        for diversity in [0.1, 0.2, 0.3, 0.4, 0.5]:
-            generate_text(text[start_index: start_index + maxlen], 15)
+        seed = text[start_index: start_index + maxlen]
+        for diversity in [0.2, 0.3, 0.4]:
+            seed = "behold the merry bride,\n white dress with yellow flowers,\nbright smile with sunny red,\nsweet my love"
+            generate_text(seed, 10)
+            print ('*' * 50)
+            seed = "land and trees cast sunny shadows,\nchildren laughter, merry sound,\nyellow birds wear long feathers,\n"
+            generate_text(seed, 10)
