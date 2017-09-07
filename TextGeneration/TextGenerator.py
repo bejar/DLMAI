@@ -132,8 +132,10 @@ if __name__ == '__main__':
         start_index = 0 #random.randint(0, len(text) - maxlen - 1)
         seed = text[start_index: start_index + maxlen]
         for diversity in [0.2, 0.3, 0.4]:
-            seed = "behold the merry bride,\n white dress with yellow flowers,\nbright smile with sunny red,\nsweet my love"
+            seed = "behold the merry bride,\nwhite dress with yellow flowers,\nbright smile with sunny red,\nsweet my love "
+            seed = seed[0:maxlen]
             generate_text(seed, 10)
             print ('*' * 50)
-            seed = "land and trees cast sunny shadows,\nchildren laughter, merry sound,\nyellow birds wear long feathers,\n"
+            seed = "land and trees cast sunny shadows,\nchildren laughter, merry sound,\nyellow birds wear long feathers, "
+            seed = seed[0:maxlen]
             generate_text(seed, 10)
