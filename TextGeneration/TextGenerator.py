@@ -43,8 +43,6 @@ def generate_text(seed, numlines):
     :param lines:
     :return:
     """
-
-
     print()
     print('----- diversity:', diversity)
 
@@ -75,6 +73,21 @@ def generate_text(seed, numlines):
             break
     print()
 
+def random_seed(chars, nchars):
+    """
+    Generates a random string
+    :param nchars:
+    :return:
+    """
+    s = ""
+    for i in range(nchars):
+        s += chars[random.randint(0, len(chars)-1)]
+
+    return s
+
+myseeds = ["behold the merry bride,\nwhite dress with yellow flowers,\nbright smile with sunny red,\nsweet my love ",
+"land and trees cast sunny shadows,\nchildren laughter, merry sound,\nyellow birds wear long feathers,\n"]
+
 if __name__ == '__main__':
     # load the text file
     path = 'poetry3.txt'
@@ -82,13 +95,14 @@ if __name__ == '__main__':
     print('corpus length:', len(text))
 
     chars = sorted(list(set(text)))
+
     print('total chars:', len(chars))
     char_indices = dict((c, i) for i, c in enumerate(chars))
     indices_char = dict((i, c) for i, c in enumerate(chars))
 
     # cut the text in semi-redundant sequences of maxlen characters
-    maxlen = 40
-    step = 5
+    maxlen = 30
+    step = 3
     sentences = []
     next_chars = []
     for i in range(0, len(text) - maxlen, step):
@@ -109,7 +123,7 @@ if __name__ == '__main__':
     # Change the implementation parameter of the LSTM to 0 for CPU and 2 for GPU
     print('Build model...')
     model = Sequential()
-    model.add(LSTM(128, input_shape=(maxlen, len(chars)), implementation=0, dropout=0.2))
+    model.add(LSTM(32, input_shape=(maxlen, len(chars)), implementation=0, dropout=0.3))
 #    model.add(LSTM(256, input_shape=(maxlen, len(chars)), implementation=2, dropout=0.2, return_sequences=True))
 #    model.add(LSTM(256, implementation=2, dropout=0.2))
     model.add(Dense(len(chars)))
@@ -117,7 +131,7 @@ if __name__ == '__main__':
 
     #optimizer = RMSprop(lr=0.01)
     optimizer = SGD(lr=0.05, momentum=0.95)
-    model.compile(loss='categorical_crossentropy', optimizer=optimizer)
+    model.compile(loss='categorical_crossentropy', optimizer="adam")
 
 
     # train the model, output generated text after each iteration
@@ -132,10 +146,8 @@ if __name__ == '__main__':
         start_index = 0 #random.randint(0, len(text) - maxlen - 1)
         seed = text[start_index: start_index + maxlen]
         for diversity in [0.2, 0.3, 0.4]:
-            seed = "behold the merry bride,\nwhite dress with yellow flowers,\nbright smile with sunny red,\nsweet my love "
-            seed = seed[0:maxlen]
+            #seed = "behold the merry bride,\nwhite dress with yellow flowers,\nbright smile with sunny red,\nsweet my love "
+            # seed = seed[0:maxlen]
+            seed = random_seed(chars, maxlen)
             generate_text(seed, 10)
-            print ('*' * 50)
-            seed = "land and trees cast sunny shadows,\nchildren laughter, merry sound,\nyellow birds wear long feathers, "
-            seed = seed[0:maxlen]
-            generate_text(seed, 10)
+ 
