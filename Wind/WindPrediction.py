@@ -6,8 +6,6 @@ WindPrediction
 
 :Description: WindPrediction
 
-    
-
 :Authors: bejar
     
 
@@ -26,6 +24,7 @@ from keras.layers import Dense, Activation
 from keras.layers import LSTM
 from keras.optimizers import RMSprop, SGD
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
 
 __author__ = 'bejar'
 
@@ -46,8 +45,13 @@ def lagged_vector(data, lag=1):
 
 if __name__ == '__main__':
     wind = np.load('wind.npy')
+    scaler = StandardScaler()
 
-    lag = 8
+    wind = scaler.fit_transform(wind)
+
+    # wind = (wind - np.min(wind)) /(np.max(wind) - np.min(wind))
+
+    lag = 20
     train = lagged_vector(wind[:100000], lag=lag)
     train_x, train_y = train[:, :-1], train[:,-1]
     train_x = np.reshape(train_x, (train_x.shape[0], train_x.shape[1], 1))
@@ -60,13 +64,13 @@ if __name__ == '__main__':
 
     print(train_x.shape, test_x.shape)
 
-    neurons = 64
-    batch_size = 100
+    neurons = 128
+    batch_size = 200
 
     model = Sequential()
-    model.add(LSTM(neurons, input_shape=(train_x.shape[1], 1), dropout=0.2, return_sequences=True))
-    model.add(LSTM(neurons, dropout=0.2, return_sequences=True))
-    model.add(LSTM(neurons, dropout=0.2))
+    model.add(LSTM(neurons, input_shape=(train_x.shape[1], 1), implementation=2, dropout=0.2, return_sequences=True))
+    model.add(LSTM(neurons, dropout=0.2, implementation=2, return_sequences=True))
+    model.add(LSTM(neurons, dropout=0.2, implementation=2))
     model.add(Dense(1))
     # model.add(Activation('relu'))
 
@@ -75,7 +79,6 @@ if __name__ == '__main__':
     model.compile(loss='mean_squared_error', optimizer='adam')
 
     nepochs = 50
-
 
     model.fit(train_x, train_y, batch_size=batch_size, epochs=nepochs)
 
@@ -93,20 +96,20 @@ if __name__ == '__main__':
 
     # step prediction
 
-    obs = np.zeros((1, lag))
+    obs = np.zeros((1, lag, 1))
     pwindow = 5
     lwpred = []
-    for i in range(0, 1000, pwindow):
+    for i in range(0, 1000-(2*lag)-pwindow, pwindow):
         # copy the observations values
         for j in range(lag):
-            obs[0, i+j] = test_y[i+j]
+            obs[0, j, 0] = test_y[i+j]
 
         lpred = []
         for j in range(pwindow):
             pred = model.predict(obs)
             lpred.append(pred)
-            obs[0, 0:-1] = obs[0, 1:]
-            obs[0, -1] = pred
+            obs[0, 0:-1, 0] = obs[0, 1:, 0]
+            obs[0, -1, 0] = pred
 
 
         lwpred.append((i, np.array(lpred)))
@@ -115,5 +118,5 @@ if __name__ == '__main__':
     plt.subplot(1, 1, 1)
     plt.plot(test_y, color='b')
     for i, (_, pred) in zip(range(0, 1000, pwindow), lwpred):
-        plt.plot(range(i+lag, i+lag+pwindow), pred, color='r')
+        plt.plot(range(i+lag, i+lag+pwindow), np.reshape(pred,pwindow), color='r')
     plt.show()
