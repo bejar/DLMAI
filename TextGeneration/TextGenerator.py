@@ -133,7 +133,6 @@ if __name__ == '__main__':
     optimizer = SGD(lr=0.05, momentum=0.95)
     model.compile(loss='categorical_crossentropy', optimizer="adam")
 
-
     # train the model, output generated text after each iteration
     for iteration in range(1, 60):
         print()
