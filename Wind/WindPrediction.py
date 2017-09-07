@@ -24,6 +24,7 @@ from keras.layers import Dense, Activation
 from keras.layers import LSTM
 from keras.optimizers import RMSprop, SGD
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
 
 __author__ = 'bejar'
 
@@ -44,6 +45,9 @@ def lagged_vector(data, lag=1):
 
 if __name__ == '__main__':
     wind = np.load('wind.npy')
+    scaler = StandardScaler()
+
+    wind = scaler.fit_transform(wind)
 
     # wind = (wind - np.min(wind)) /(np.max(wind) - np.min(wind))
 
@@ -64,10 +68,9 @@ if __name__ == '__main__':
     batch_size = 200
 
     model = Sequential()
-    model.add(LSTM(neurons, input_shape=(train_x.shape[1], 1), implementation=2, dropout=0.2))
-    # model.add(LSTM(neurons, input_shape=(train_x.shape[1], 1), implementation=2, dropout=0.2, return_sequences=True))
-    # model.add(LSTM(neurons, dropout=0.2, implementation=2, return_sequences=True))
-    # model.add(LSTM(neurons, dropout=0.2, implementation=2))
+    model.add(LSTM(neurons, input_shape=(train_x.shape[1], 1), implementation=2, dropout=0.2, return_sequences=True))
+    model.add(LSTM(neurons, dropout=0.2, implementation=2, return_sequences=True))
+    model.add(LSTM(neurons, dropout=0.2, implementation=2))
     model.add(Dense(1))
     # model.add(Activation('relu'))
 
