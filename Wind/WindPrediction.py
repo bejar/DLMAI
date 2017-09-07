@@ -77,7 +77,6 @@ if __name__ == '__main__':
 
     nepochs = 50
 
-
     model.fit(train_x, train_y, batch_size=batch_size, epochs=nepochs)
 
     train_predict = model.predict(train_x)
