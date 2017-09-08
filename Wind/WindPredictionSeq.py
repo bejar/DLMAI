@@ -74,7 +74,7 @@ if __name__ == '__main__':
     # model.add(LSTM(neurons, dropout=0.2, implementation=2))
     model.add(RepeatVector(lenpred))
     model.add(LSTM(neurons, dropout=0.2, implementation=2, return_sequences=True))
-    model.add(TimeDistributed(Dense(lenpred)))
+    model.add(TimeDistributed(Dense(1)))
 
     # model.add(Activation('relu'))
 
