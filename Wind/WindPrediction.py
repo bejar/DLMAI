@@ -21,7 +21,7 @@ import numpy as np
 
 from keras.models import Sequential
 from keras.layers import Dense, Activation
-from keras.layers import LSTM
+from keras.layers import LSTM, GRU
 from keras.optimizers import RMSprop, SGD
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
@@ -47,36 +47,43 @@ if __name__ == '__main__':
     wind = np.load('wind.npy')
     scaler = StandardScaler()
 
-    wind = scaler.fit_transform(wind)
+    wind = scaler.fit_transform(wind.reshape(-1, 1))
 
     # wind = (wind - np.min(wind)) /(np.max(wind) - np.min(wind))
 
     lag = 20
-    train = lagged_vector(wind[:100000], lag=lag)
+    train = lagged_vector(wind[:200000], lag=lag)
     train_x, train_y = train[:, :-1], train[:,-1]
     train_x = np.reshape(train_x, (train_x.shape[0], train_x.shape[1], 1))
 
-    test = lagged_vector(wind[100000:101000], lag=lag)
+    test = lagged_vector(wind[200000:202000], lag=lag)
     test_x, test_y = test[:, :-1], test[:,-1]
     test_x = np.reshape(test_x, (test_x.shape[0], test_x.shape[1], 1))
 
-    print(test_x[0,3,0], test_y[0])
+    # print(test_x[0,3,0], test_y[0])
 
     print(train_x.shape, test_x.shape)
 
-    neurons = 128
-    batch_size = 200
+    neurons = 32
+    batch_size = 1000
+
+    RNN = GRU  # LSTM
+
 
     model = Sequential()
-    model.add(LSTM(neurons, input_shape=(train_x.shape[1], 1), implementation=2, dropout=0.2, return_sequences=True))
-    model.add(LSTM(neurons, dropout=0.2, implementation=2, return_sequences=True))
-    model.add(LSTM(neurons, dropout=0.2, implementation=2))
+    # model.add(LSTM(neurons, input_shape=(train_x.shape[1], 1), implementation=2, dropout=0.2))
+    model.add(RNN(neurons, input_shape=(train_x.shape[1], 1), implementation=2, dropout=0.2, return_sequences=True))
+    model.add(RNN(neurons, dropout=0.2, implementation=2, return_sequences=True))
+    model.add(RNN(neurons, dropout=0.2, implementation=2, return_sequences=True))
+    model.add(RNN(neurons, dropout=0.2, implementation=2, return_sequences=True))
+    model.add(RNN(neurons, dropout=0.2, implementation=2))
     model.add(Dense(1))
     # model.add(Activation('relu'))
 
     # optimizer = RMSprop(lr=0.001)
-    optimizer = SGD(lr=0.0001, momentum=0.95)
-    model.compile(loss='mean_squared_error', optimizer='adam')
+    # optimizer = SGD(lr=0.0001, momentum=0.95)
+    optimizer = RMSprop(lr=0.00001)
+    model.compile(loss='mean_squared_error', optimizer=optimizer)
 
     nepochs = 50
 
@@ -99,7 +106,7 @@ if __name__ == '__main__':
     obs = np.zeros((1, lag, 1))
     pwindow = 5
     lwpred = []
-    for i in range(0, 1000-(2*lag)-pwindow, pwindow):
+    for i in range(0, 2000-(2*lag)-pwindow, pwindow):
         # copy the observations values
         for j in range(lag):
             obs[0, j, 0] = test_y[i+j]
@@ -108,7 +115,8 @@ if __name__ == '__main__':
         for j in range(pwindow):
             pred = model.predict(obs)
             lpred.append(pred)
-            obs[0, 0:-1, 0] = obs[0, 1:, 0]
+            for k in range(lag-1):
+                obs[0, k, 0] = obs[0, k+1, 0]
             obs[0, -1, 0] = pred
 
 
@@ -117,6 +125,6 @@ if __name__ == '__main__':
 
     plt.subplot(1, 1, 1)
     plt.plot(test_y, color='b')
-    for i, (_, pred) in zip(range(0, 1000, pwindow), lwpred):
+    for i, (_, pred) in zip(range(0, 2000, pwindow), lwpred):
         plt.plot(range(i+lag, i+lag+pwindow), np.reshape(pred,pwindow), color='r')
     plt.show()
