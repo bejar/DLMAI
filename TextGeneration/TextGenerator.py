@@ -96,7 +96,7 @@ myseeds = ["behold the merry bride,\nwhite dress with yellow flowers,\nbright sm
 
 if __name__ == '__main__':
     # load the text file
-    path = 'poetry3.txt'
+    path = 'poetry4.txt'
     text = open(path).read().lower().decode('ascii', 'ignore')
     print('corpus length:', len(text))
 
@@ -150,10 +150,12 @@ if __name__ == '__main__':
     #optimizer = RMSprop(lr=0.01)
     optimizer = SGD(lr=0.05, momentum=0.95)
     model.compile(loss='categorical_crossentropy', optimizer="adam")
-    gfile = open('tgenerated-ML%d-S%d-NL%d-D%3.2f-BS%d.txt' % (maxlen, lsize, nlayers, dropout, bsize), 'w')
-
 
     bsize = 256
+
+    # File for saving the generated text each iteration
+    gfile = open('tgenerated-ML%d-S%d-NL%d-D%3.2f-BS%d.txt' % (maxlen, lsize, nlayers, dropout, bsize), 'w')
+
     # train the model, output generated text after each iteration
     for iteration in range(1, 50):
         print()
