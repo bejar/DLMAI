@@ -18,14 +18,9 @@ SentimentTwAir
 """
 
 from __future__ import print_function
-import sklearn
-import matplotlib.pyplot as plt
 import pandas
 from sklearn.metrics import confusion_matrix, classification_report
-from sklearn.model_selection import train_test_split
-import numpy
 import re
-import nltk
 from nltk.corpus import stopwords
 import numpy as np
 from keras.models import Sequential
@@ -38,7 +33,7 @@ def tweet_to_words(raw_tweet):
     letters_only = re.sub("[^a-zA-Z@]", " ", raw_tweet)
     words = letters_only.lower().split()
     stops = set(stopwords.words("english"))
-    meaningful_words = [w for w in words if not w in stops and not re.match("^[@]", w) and not re.match("flight",w)]
+    meaningful_words = [w for w in words if not w in stops and not re.match("^[@]", w)]
     return( " ".join( meaningful_words ))
 
 
@@ -47,11 +42,12 @@ if __name__ == '__main__':
     # Data
 
     Tweet = pandas.read_csv("Airlines.csv")
+    Tweet = pandas.read_csv("Presidential.csv")
 
     #Pre-process the tweet and store in a separate column
     Tweet['clean_tweet'] = Tweet['text'].apply(lambda x: tweet_to_words(x))
     #Convert sentiment to binary
-    Tweet['sentiment'] = Tweet['airline_sentiment'].apply(lambda x: 0 if x == 'negative' else 1 if x == 'positive' else 2)
+    Tweet['sentiment'] = Tweet['twsentiment'].apply(lambda x: 0 if x == 'negative' else 1 if x == 'positive' else 2)
 
     #Join all the words in review to build a corpus
     all_text = ' '.join(Tweet['clean_tweet'])
