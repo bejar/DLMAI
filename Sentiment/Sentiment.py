@@ -28,8 +28,15 @@ from keras.layers import Dense, Activation, Embedding
 from keras.layers import LSTM
 from keras.optimizers import RMSprop, SGD
 from keras.utils import np_utils
+from collections import Counter
 
 def tweet_to_words(raw_tweet):
+    """
+    Only keeps ascii characters in the tweet and discards stopwords and @words
+
+    :param raw_tweet:
+    :return:
+    """
     letters_only = re.sub("[^a-zA-Z@]", " ", raw_tweet)
     words = letters_only.lower().split()
     stops = set(stopwords.words("english"))
@@ -42,7 +49,7 @@ if __name__ == '__main__':
     # Data
 
     Tweet = pandas.read_csv("Airlines.csv")
-    Tweet = pandas.read_csv("Presidential.csv")
+    # Tweet = pandas.read_csv("Presidential.csv")
 
     #Pre-process the tweet and store in a separate column
     Tweet['clean_tweet'] = Tweet['text'].apply(lambda x: tweet_to_words(x))
@@ -54,14 +61,15 @@ if __name__ == '__main__':
     words = all_text.split()
 
     # Convert words to integers
-    from collections import Counter
     counts = Counter(words)
-    vocab = sorted(counts, key=counts.get, reverse=True)
+
+    numwords = 5000 # Linit the number of words to use
+    vocab = sorted(counts, key=counts.get, reverse=True)[:numwords]
     vocab_to_int = {word: ii for ii, word in enumerate(vocab, 1)}
 
     tweet_ints = []
     for each in Tweet['clean_tweet']:
-        tweet_ints.append([vocab_to_int[word] for word in each.split()])
+        tweet_ints.append([vocab_to_int[word] for word in each.split() if word in vocab_to_int])
 
     #Create a list of labels
     labels = np.array(Tweet['sentiment'])
@@ -69,7 +77,7 @@ if __name__ == '__main__':
     #Find the number of tweets with zero length after the data pre-processing
     tweet_len = Counter([len(x) for x in tweet_ints])
     print("Zero-length reviews: {}".format(tweet_len[0]))
-    print("Maximum review length: {}".format(max(tweet_len)))
+    print("Maximum tweet length: {}".format(max(tweet_len)))
 
     #Remove those tweets with zero length and its correspoding label
     tweet_idx  = [idx for idx,tweet in enumerate(tweet_ints) if len(tweet) > 0]
