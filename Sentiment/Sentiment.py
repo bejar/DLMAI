@@ -118,14 +118,15 @@ if __name__ == '__main__':
     RNN = LSTM  # GRU
 
     neurons = 64
+    embedding = 20
 
     model = Sequential()
-    model.add(Embedding(len(tweet_ints), neurons))
+    model.add(Embedding(len(tweet_ints), embedding))
 
     if nlayers == 1:
-        model.add(RNN(neurons, input_shape=(train_x.shape[1], 1), implementation=impl, dropout=drop))
+        model.add(RNN(neurons, implementation=impl, dropout=drop))
     else:
-        model.add(RNN(neurons, input_shape=(train_x.shape[1], 1), implementation=impl, dropout=drop, return_sequences=True))
+        model.add(RNN(neurons, implementation=impl, dropout=drop, return_sequences=True))
         for i in range(1, nlayers-1):
             model.add(RNN(neurons, dropout=drop, implementation=impl, return_sequences=True))
         model.add(RNN(neurons, dropout=drop, implementation=impl))
