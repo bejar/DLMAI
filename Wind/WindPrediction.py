@@ -86,9 +86,7 @@ if __name__ == '__main__':
             model.add(RNN(neurons, dropout=drop, implementation=impl, return_sequences=True))
         model.add(RNN(neurons, dropout=drop, implementation=impl))
     model.add(Dense(1))
-    # model.add(Activation('relu'))
 
-    # optimizer = RMSprop(lr=0.001)
     # optimizer = SGD(lr=0.0001, momentum=0.95)
     optimizer = RMSprop(lr=0.00001)
     model.compile(loss='mean_squared_error', optimizer=optimizer)
