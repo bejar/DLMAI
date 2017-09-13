@@ -44,39 +44,47 @@ def lagged_vector(data, lag=1):
 
 
 if __name__ == '__main__':
-    wind = np.load('wind.npy')
-    scaler = StandardScaler()
 
+    vars = {0: 'wind_speed', 1: 'air_density', 2: 'temperature', 3: 'pressure'}
+
+    wind = np.load('Wind.npz')
+    print(wind.files)
+    wind = wind[wind.files[0]]
+    print(wind.shape)
+    wind = wind[:, 0]
+
+    scaler = StandardScaler()
     wind = scaler.fit_transform(wind.reshape(-1, 1))
 
-    # wind = (wind - np.min(wind)) /(np.max(wind) - np.min(wind))
-
     lag = 20
-    train = lagged_vector(wind[:200000], lag=lag)
+    wind_train = scaler.fit_transform(wind[:200000, 0].reshape(-1, 1))
+    train = lagged_vector(wind_train, lag=lag)
     train_x, train_y = train[:, :-1], train[:,-1]
     train_x = np.reshape(train_x, (train_x.shape[0], train_x.shape[1], 1))
 
-    test = lagged_vector(wind[200000:202000], lag=lag)
+    wind_test = scaler.fit_transform(wind[200000:, 0].reshape(-1, 1))
+    test = lagged_vector(wind_test, lag=lag)
     test_x, test_y = test[:, :-1], test[:,-1]
     test_x = np.reshape(test_x, (test_x.shape[0], test_x.shape[1], 1))
 
-    # print(test_x[0,3,0], test_y[0])
-
     print(train_x.shape, test_x.shape)
 
-    neurons = 32
+    neurons = 64
     batch_size = 1000
-
-    RNN = GRU  # LSTM
+    impl = 0  # 0 for CPU, 2 for GPU
+    drop = 0.2
+    nlayers = 2  # >= 1
+    RNN = LSTM  # GRU
 
 
     model = Sequential()
-    # model.add(LSTM(neurons, input_shape=(train_x.shape[1], 1), implementation=2, dropout=0.2))
-    model.add(RNN(neurons, input_shape=(train_x.shape[1], 1), implementation=2, dropout=0.2, return_sequences=True))
-    model.add(RNN(neurons, dropout=0.2, implementation=2, return_sequences=True))
-    model.add(RNN(neurons, dropout=0.2, implementation=2, return_sequences=True))
-    model.add(RNN(neurons, dropout=0.2, implementation=2, return_sequences=True))
-    model.add(RNN(neurons, dropout=0.2, implementation=2))
+    if nlayers == 1:
+        model.add(LSTM(neurons, input_shape=(train_x.shape[1], 1), implementation=impl, dropout=drop))
+    else:
+        model.add(RNN(neurons, input_shape=(train_x.shape[1], 1), implementation=impl, dropout=drop, return_sequences=True))
+        for i in range(1, nlayers-1):
+            model.add(RNN(neurons, dropout=drop, implementation=impl, return_sequences=True))
+        model.add(RNN(neurons, dropout=drop, implementation=impl))
     model.add(Dense(1))
     # model.add(Activation('relu'))
 
