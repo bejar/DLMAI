@@ -74,10 +74,10 @@ if __name__ == '__main__':
     ############################################
     # Model
 
-    neurons = 64
+    neurons = 32
     impl = 0  # 0 for CPU, 2 for GPU
     drop = 0.2
-    nlayers = 2  # >= 1
+    nlayers = 3  # >= 1
     RNN = LSTM  # GRU
 
 
