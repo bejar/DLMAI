@@ -113,35 +113,10 @@ if __name__ == '__main__':
 
     print('MSE= ', score)
 
-    plt.subplot(1, 1, 1)
+    plt.subplot(2, 1, 1)
     plt.plot(test_predict, color='r')
     plt.plot(test_y, color='b')
+    plt.subplot(2, 1, 2)
+    plt.plot(test_y - test_predict, color='r')
     plt.show()
 
-    # step prediction
-
-    obs = np.zeros((1, lag, 1))
-    pwindow = 5
-    lwpred = []
-    for i in range(0, 2000-(2*lag)-pwindow, pwindow):
-        # copy the observations values
-        for j in range(lag):
-            obs[0, j, 0] = test_y[i+j]
-
-        lpred = []
-        for j in range(pwindow):
-            pred = model.predict(obs)
-            lpred.append(pred)
-            for k in range(lag-1):
-                obs[0, k, 0] = obs[0, k+1, 0]
-            obs[0, -1, 0] = pred
-
-
-        lwpred.append((i, np.array(lpred)))
-
-
-    plt.subplot(1, 1, 1)
-    plt.plot(test_y, color='b')
-    for i, (_, pred) in zip(range(0, 2000, pwindow), lwpred):
-        plt.plot(range(i+lag, i+lag+pwindow), np.reshape(pred,pwindow), color='r')
-    plt.show()
