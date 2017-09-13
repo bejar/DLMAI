@@ -106,12 +106,16 @@ if __name__ == '__main__':
     ############################################
     # Results
 
-    train_predict = model.predict(train_x)
-    test_predict = model.predict(test_x)
+    train_predict = model.predict(train_x).flatten()
+    test_predict = model.predict(test_x).flatten()
 
     score = model.evaluate(test_x, test_y, batch_size=batch_size)
 
     print('MSE= ', score)
+
+    print(test_y.shape, test_predict.shape)
+    z = (test_y - test_predict)
+    print (z[:10])
 
     plt.subplot(2, 1, 1)
     plt.plot(test_predict, color='r')
