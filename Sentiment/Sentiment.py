@@ -118,7 +118,7 @@ if __name__ == '__main__':
     RNN = LSTM  # GRU
 
     neurons = 128
-    embedding = 20
+    embedding = 40
 
     model = Sequential()
     model.add(Embedding(len(tweet_ints), embedding))

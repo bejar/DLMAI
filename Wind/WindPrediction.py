@@ -51,20 +51,20 @@ if __name__ == '__main__':
 
     wind = np.load('Wind.npz')
     print(wind.files)
-    wind = wind[wind.files[0]]
+    wind = wind['90-45142']
     print(wind.shape)
     wind = wind[:, 0]
 
     scaler = StandardScaler()
     wind = scaler.fit_transform(wind.reshape(-1, 1))
 
-    lag = 20
-    wind_train = scaler.fit_transform(wind[:200000, 0].reshape(-1, 1))
+    lag = 10
+    wind_train = wind[:200000, 0]
     train = lagged_vector(wind_train, lag=lag)
     train_x, train_y = train[:, :-1], train[:,-1]
     train_x = np.reshape(train_x, (train_x.shape[0], train_x.shape[1], 1))
 
-    wind_test = scaler.fit_transform(wind[200000:, 0].reshape(-1, 1))
+    wind_test = wind[200000:, 0]
     test = lagged_vector(wind_test, lag=lag)
     test_x, test_y = test[:, :-1], test[:,-1]
     test_x = np.reshape(test_x, (test_x.shape[0], test_x.shape[1], 1))
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     ############################################
     # Model
 
-    neurons = 32
+    neurons = 64
     impl = 0  # 0 for CPU, 2 for GPU
     drop = 0.2
     nlayers = 3  # >= 1
