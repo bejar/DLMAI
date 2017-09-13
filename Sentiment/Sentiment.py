@@ -161,12 +161,6 @@ if __name__ == '__main__':
     print(acc)
 
     test_pred = model.predict_classes(test_x)
-    test_pred_flat = (np.array(test_pred)).flatten()
-    start_idx = len(train_x) + len(val_x)
-    end_idx = start_idx + len(test_pred_flat)+1
-    Tweet.loc[start_idx:end_idx,'predicted_sentiment'] = test_pred_flat
-
-
 
     print()
     print(confusion_matrix(test_y, test_pred))
