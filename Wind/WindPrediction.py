@@ -44,6 +44,8 @@ def lagged_vector(data, lag=1):
 
 
 if __name__ == '__main__':
+    ############################################
+    # Data
 
     vars = {0: 'wind_speed', 1: 'air_density', 2: 'temperature', 3: 'pressure'}
 
@@ -69,8 +71,10 @@ if __name__ == '__main__':
 
     print(train_x.shape, test_x.shape)
 
+    ############################################
+    # Model
+
     neurons = 64
-    batch_size = 1000
     impl = 0  # 0 for CPU, 2 for GPU
     drop = 0.2
     nlayers = 2  # >= 1
@@ -79,7 +83,7 @@ if __name__ == '__main__':
 
     model = Sequential()
     if nlayers == 1:
-        model.add(LSTM(neurons, input_shape=(train_x.shape[1], 1), implementation=impl, dropout=drop))
+        model.add(RNN(neurons, input_shape=(train_x.shape[1], 1), implementation=impl, dropout=drop))
     else:
         model.add(RNN(neurons, input_shape=(train_x.shape[1], 1), implementation=impl, dropout=drop, return_sequences=True))
         for i in range(1, nlayers-1):
@@ -87,13 +91,20 @@ if __name__ == '__main__':
         model.add(RNN(neurons, dropout=drop, implementation=impl))
     model.add(Dense(1))
 
-    # optimizer = SGD(lr=0.0001, momentum=0.95)
+
+    ############################################
+    # Training
+
     optimizer = RMSprop(lr=0.00001)
     model.compile(loss='mean_squared_error', optimizer=optimizer)
 
+    batch_size = 1000
     nepochs = 50
 
     model.fit(train_x, train_y, batch_size=batch_size, epochs=nepochs)
+
+    ############################################
+    # Results
 
     train_predict = model.predict(train_x)
     test_predict = model.predict(test_x)

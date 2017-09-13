@@ -27,9 +27,11 @@ import re
 import nltk
 from nltk.corpus import stopwords
 import numpy as np
-
-
-__author__ = 'bejar'
+from keras.models import Sequential
+from keras.layers import Dense, Activation, Embedding
+from keras.layers import LSTM
+from keras.optimizers import RMSprop, SGD
+from keras.utils import np_utils
 
 def tweet_to_words(raw_tweet):
     letters_only = re.sub("[^a-zA-Z@]", " ", raw_tweet)
@@ -40,6 +42,8 @@ def tweet_to_words(raw_tweet):
 
 
 if __name__ == '__main__':
+    ############################################
+    # Data
 
     Tweet = pandas.read_csv("Tweets.csv")
 
@@ -100,27 +104,39 @@ if __name__ == '__main__':
           "\nTest set: \t\t{}".format(test_y.shape))
 
 
-    lstm_size = 256
-    batch_size = 100
-    learning_rate = 0.01
+    ############################################
+    # Model
 
-    from keras.models import Sequential
-    from keras.layers import Dense, Activation, Embedding
-    from keras.layers import LSTM
-    from keras.optimizers import RMSprop, SGD
-    from keras.utils import np_utils
+    impl = 0  # 0 for CPU, 2 for GPU
+    drop = 0.2
+    nlayers = 2  # >= 1
+    RNN = LSTM  # GRU
+
+    neurons = 64
 
     model = Sequential()
-    model.add(Embedding(len(tweet_ints), lstm_size))
-    #model.add(LSTM(lstm_size, implementation=0, return_sequences=True, dropout=0.2))
-    model.add(LSTM(lstm_size, implementation=0, dropout=0.3))
+    model.add(Embedding(len(tweet_ints), neurons))
+
+    if nlayers == 1:
+        model.add(RNN(neurons, input_shape=(train_x.shape[1], 1), implementation=impl, dropout=drop))
+    else:
+        model.add(RNN(neurons, input_shape=(train_x.shape[1], 1), implementation=impl, dropout=drop, return_sequences=True))
+        for i in range(1, nlayers-1):
+            model.add(RNN(neurons, dropout=drop, implementation=impl, return_sequences=True))
+        model.add(RNN(neurons, dropout=drop, implementation=impl))
+
     model.add(Dense(3))
     model.add(Activation('softmax'))
 
+    ############################################
+    # Training
+
+    learning_rate = 0.01
     optimizer = SGD(lr=learning_rate, momentum=0.95)
     model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 
     epochs = 50
+    batch_size = 100
 
     train_y_c = np_utils.to_categorical(train_y, 3)
     val_y_c = np_utils.to_categorical(val_y, 3)
@@ -129,6 +145,9 @@ if __name__ == '__main__':
               batch_size=batch_size,
               epochs=epochs,
               validation_data=(val_x, val_y_c))
+
+    ############################################
+    # Results
 
     test_y_c = np_utils.to_categorical(test_y, 3)
     score, acc = model.evaluate(test_x, test_y_c,

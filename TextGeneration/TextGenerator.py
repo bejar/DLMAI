@@ -129,20 +129,21 @@ if __name__ == '__main__':
     # Change the implementation parameter of the LSTM to 0 for CPU and 2 for GPU
     print('Build model...')
 
+    RNN = LSTM  # GRU
     lsize = 64
-    nlayers = 1
+    nlayers = 2
     impl = 0
     dropout = 0.2
-    bsize = 256
+
 
     model = Sequential()
     if nlayers == 1:
-        model.add(LSTM(lsize, input_shape=(maxlen, len(chars)), implementation=impl, dropout=dropout))
+        model.add(RNN(lsize, input_shape=(maxlen, len(chars)), implementation=impl, dropout=dropout))
     else:
-        model.add(LSTM(lsize, input_shape=(maxlen, len(chars)), implementation=impl, dropout=dropout, return_sequences=True))
+        model.add(RNN(lsize, input_shape=(maxlen, len(chars)), implementation=impl, dropout=dropout, return_sequences=True))
         for i in range(1, nlayers-1):
-            model.add(LSTM(lsize, implementation=impl, dropout=dropout, return_sequences=True))
-        model.add(LSTM(lsize, implementation=impl, dropout=dropout))
+            model.add(RNN(lsize, implementation=impl, dropout=dropout, return_sequences=True))
+        model.add(RNN(lsize, implementation=impl, dropout=dropout))
     model.add(Dense(len(chars)))
     model.add(Activation('softmax'))
 
@@ -151,6 +152,8 @@ if __name__ == '__main__':
     model.compile(loss='categorical_crossentropy', optimizer="adam")
     gfile = open('tgenerated-ML%d-S%d-NL%d-D%3.2f-BS%d.txt' % (maxlen, lsize, nlayers, dropout, bsize), 'w')
 
+
+    bsize = 256
     # train the model, output generated text after each iteration
     for iteration in range(1, 50):
         print()

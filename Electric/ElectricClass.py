@@ -27,6 +27,9 @@ from keras.utils import np_utils
 from sklearn.metrics import confusion_matrix, classification_report
 
 if __name__ == '__main__':
+    ############################################
+    # Data
+
     train = np.loadtxt('ElectricDevices_TRAIN.csv', delimiter=',')
     print(train.shape)
     train_x =  train[:, 1:]
@@ -43,25 +46,47 @@ if __name__ == '__main__':
     test_y = test[:, 0] - 1
     test_y_c = np_utils.to_categorical(test_y, nclasses)
 
-    lstm_size = 512
-    batch_size = 100
-    epochs = 50
+    ############################################
+    # Model
+
+    RNN = LSTM  # GRU
+    neurons = 64
+
+    impl = 0  # 0 for CPU, 2 for GPU
+    drop = 0.2
+    nlayers = 2  # >= 1
 
     model = Sequential()
-    model.add(LSTM(lstm_size, input_shape=(train_x.shape[1], 1), implementation=2, dropout=0.2))
-#    model.add(LSTM(lstm_size, input_shape=(train_x.shape[0], train_x.shape[1]), implementation=2, dropout=0.2, return_sequences=True))
-#    model.add(LSTM(lstm_size, implementation=2, dropout=0.2))
+
+    if nlayers == 1:
+        model.add(RNN(neurons, input_shape=(train_x.shape[1], 1), implementation=impl, dropout=drop))
+    else:
+        model.add(RNN(neurons, input_shape=(train_x.shape[1], 1), implementation=impl, dropout=drop, return_sequences=True))
+        for i in range(1, nlayers-1):
+            model.add(RNN(neurons, dropout=drop, implementation=impl, return_sequences=True))
+
+        model.add(RNN(neurons, dropout=drop, implementation=impl))
+
     model.add(Dense(nclasses))
     model.add(Activation('softmax'))
+
+
+    ############################################
+    # Training
 
     #optimizer = RMSprop(lr=0.01)
     optimizer = SGD(lr=0.01, momentum=0.95)
     model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 
+    epochs = 50
+    batch_size = 1000
     model.fit(train_x, train_y_c,
           batch_size=batch_size,
           epochs=epochs,
           validation_data=(test_x, test_y_c))
+
+    ############################################
+    # Results
 
     score, acc = model.evaluate(test_x, test_y_c, batch_size=batch_size)
 
