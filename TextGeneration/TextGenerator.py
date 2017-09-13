@@ -28,7 +28,14 @@ import random
 import sys
 
 def sample(preds, temperature=1.0):
-    # helper function to sample an index from a probability array
+    """
+    helper function to sample an index from a probability array
+
+    :param preds:
+    :param temperature:
+    :return:
+    """
+
     preds = np.asarray(preds).astype('float64')
     preds = np.log(preds) / temperature
     exp_preds = np.exp(preds)
@@ -166,23 +173,19 @@ if __name__ == '__main__':
     gfile = open('tgenerated-ML%d-S%d-NL%d-D%3.2f-BS%d.txt' % (maxlen, lsize, nlayers, dropout, bsize), 'w')
 
     # train the model, output generated text after each iteration
-    for iteration in range(1, iterations):
+    for iteration in range(iterations):
         print()
         print('-' * 50)
-        print('Iteration', iteration)
+        print('Iteration', iteration+1)
         model.fit(X, y,
                   batch_size=bsize,
                   epochs=epoch_it)
 
         gfile.write('-' * 50)
         gfile.write('\n')
-        gfile.write('Iteration %d\n' % iteration)
-        start_index = 0 #random.randint(0, len(text) - maxlen - 1)
-        seed = text[start_index: start_index + maxlen]
+        gfile.write('Iteration %d\n' % iteration+1)
         seed = random_seed(chars, maxlen)
         for diversity in [0.2, 0.3, 0.4]:
-            #seed = "behold the merry bride,\nwhite dress with yellow flowers,\nbright smile with sunny red,\nsweet my love "
-            # seed = seed[0:maxlen]
             gfile.write('\n\n')
             gfile.write('DIV = %3.2f\n\n' % diversity)
             generate_text(seed, 10, gfile, wseed=False)
