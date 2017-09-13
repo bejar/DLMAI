@@ -49,7 +49,7 @@ if __name__ == '__main__':
     # Data
 
     Tweet = pandas.read_csv("Airlines.csv")
-    # Tweet = pandas.read_csv("Presidential.csv")
+    Tweet = pandas.read_csv("Presidential.csv")
 
     #Pre-process the tweet and store in a separate column
     Tweet['clean_tweet'] = Tweet['text'].apply(lambda x: tweet_to_words(x))
@@ -113,11 +113,11 @@ if __name__ == '__main__':
     # Model
 
     impl = 0  # 0 for CPU, 2 for GPU
-    drop = 0.5
+    drop = 0.2
     nlayers = 2  # >= 1
     RNN = LSTM  # GRU
 
-    neurons = 64
+    neurons = 128
     embedding = 20
 
     model = Sequential()
@@ -157,11 +157,11 @@ if __name__ == '__main__':
 
     test_y_c = np_utils.to_categorical(test_y, 3)
     score, acc = model.evaluate(test_x, test_y_c,
-                                batch_size=batch_size)
+                                batch_size=batch_size ,verbose=0)
     print()
-    print(acc)
+    print('Test ACC=', acc)
 
-    test_pred = model.predict_classes(test_x)
+    test_pred = model.predict_classes(test_x ,verbose=0)
 
     print()
     print(confusion_matrix(test_y, test_pred))
