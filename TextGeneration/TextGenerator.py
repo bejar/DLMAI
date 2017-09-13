@@ -95,7 +95,9 @@ myseeds = ["behold the merry bride,\nwhite dress with yellow flowers,\nbright sm
 "land and trees cast sunny shadows,\nchildren laughter, merry sound,\nyellow birds wear long feathers,\n"]
 
 if __name__ == '__main__':
-    # load the text file
+    ############################################
+    # Data
+
     path = 'poetry4.txt'
     text = open(path).read().lower().decode('ascii', 'ignore')
     print('corpus length:', len(text))
@@ -125,7 +127,10 @@ if __name__ == '__main__':
             X[i, t, char_indices[char]] = 1
         y[i, char_indices[next_chars[i]]] = 1
 
-    # build the model: a single LSTM
+
+    ############################################
+    # Model
+
     # Change the implementation parameter of the LSTM to 0 for CPU and 2 for GPU
     print('Build model...')
 
@@ -134,7 +139,6 @@ if __name__ == '__main__':
     nlayers = 2
     impl = 0
     dropout = 0.2
-
 
     model = Sequential()
     if nlayers == 1:
@@ -147,23 +151,28 @@ if __name__ == '__main__':
     model.add(Dense(len(chars)))
     model.add(Activation('softmax'))
 
+
+    ############################################
+    # Training
     #optimizer = RMSprop(lr=0.01)
     optimizer = SGD(lr=0.05, momentum=0.95)
     model.compile(loss='categorical_crossentropy', optimizer="adam")
 
     bsize = 256
+    iterations = 50
+    epoch_it = 10
 
     # File for saving the generated text each iteration
     gfile = open('tgenerated-ML%d-S%d-NL%d-D%3.2f-BS%d.txt' % (maxlen, lsize, nlayers, dropout, bsize), 'w')
 
     # train the model, output generated text after each iteration
-    for iteration in range(1, 50):
+    for iteration in range(1, iterations):
         print()
         print('-' * 50)
         print('Iteration', iteration)
         model.fit(X, y,
                   batch_size=bsize,
-                  epochs=10)
+                  epochs=epoch_it)
 
         gfile.write('-' * 50)
         gfile.write('\n')
