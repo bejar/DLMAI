@@ -15,8 +15,6 @@ WindPrediction
 
 """
 
-
-from __future__ import print_function
 import numpy as np
 
 from keras.models import Sequential
@@ -100,8 +98,12 @@ if __name__ == '__main__':
 
     batch_size = 1000
     nepochs = 50
+    verbose = 0  # 1
 
-    model.fit(train_x, train_y, batch_size=batch_size, epochs=nepochs)
+    model.fit(train_x, train_y,
+              batch_size=batch_size,
+              epochs=nepochs,
+              verbose=verbose)
 
     ############################################
     # Results
@@ -109,7 +111,9 @@ if __name__ == '__main__':
     train_predict = model.predict(train_x).flatten()
     test_predict = model.predict(test_x).flatten()
 
-    score = model.evaluate(test_x, test_y, batch_size=batch_size)
+    score = model.evaluate(test_x, test_y,
+                           batch_size=batch_size,
+                           verbose=verbose)
 
     print('MSE= ', score)
 
@@ -117,10 +121,10 @@ if __name__ == '__main__':
     z = (test_y - test_predict)
     print (z[:10])
 
-    plt.subplot(2, 1, 1)
-    plt.plot(test_predict, color='r')
-    plt.plot(test_y, color='b')
-    plt.subplot(2, 1, 2)
-    plt.plot(test_y - test_predict, color='r')
-    plt.show()
-
+    if verbose:
+        plt.subplot(2, 1, 1)
+        plt.plot(test_predict, color='r')
+        plt.plot(test_y, color='b')
+        plt.subplot(2, 1, 2)
+        plt.plot(test_y - test_predict, color='r')
+        plt.show()

@@ -19,7 +19,6 @@ Five digits inverted:
 + One layer LSTM (128 HN), 550k training examples = 99% train/test accuracy in 30 epochs
 """
 
-from __future__ import print_function
 from keras.models import Sequential
 from keras import layers
 import numpy as np
@@ -56,12 +55,6 @@ class CharacterTable(object):
         if calc_argmax:
             x = x.argmax(axis=-1)
         return ''.join(self.indices_char[x] for x in x)
-
-
-class colors:
-    ok = '\033[92m'
-    fail = '\033[91m'
-    close = '\033[0m'
 
 
 if __name__ == '__main__':
@@ -137,7 +130,6 @@ if __name__ == '__main__':
     print(x_val.shape)
     print(y_val.shape)
 
-
     ############################################
     # Model
 
@@ -182,14 +174,16 @@ if __name__ == '__main__':
     # Train the model each generation and show predictions against the validation
     # dataset.
 
-    for iteration in range(1, 200):
+    verbose = 0  # 1
+    iterations = 5
+    for iteration in range(1, iterations + 1):
         print()
         print('-' * 50)
         print('Iteration', iteration)
         model.fit(x_train, y_train,
                   batch_size=BATCH_SIZE,
                   epochs=1,
-                  validation_data=(x_val, y_val))
+                  validation_data=(x_val, y_val), verbose=verbose)
         # Select 10 samples from the validation set at random so we can visualize
         # errors.
         for i in range(10):
@@ -202,8 +196,8 @@ if __name__ == '__main__':
             print('Q', q[::-1] if INVERT else q)
             print('T', correct)
             if correct == guess:
-                print(colors.ok + '^' + colors.close, end=" ")
+                print('+', end=" ")
             else:
-                print(colors.fail + 'v' + colors.close, end=" ")
+                print('-', end=" ")
             print(guess)
         print('---')

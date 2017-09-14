@@ -17,15 +17,14 @@ TextGenerator
 
 """
 
-from __future__ import print_function
 from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras.layers import LSTM
 from keras.optimizers import RMSprop, SGD
-from keras.utils.data_utils import get_file
 import numpy as np
 import random
-import sys
+import gzip
+
 
 def sample(preds, temperature=1.0):
     """
@@ -42,6 +41,7 @@ def sample(preds, temperature=1.0):
     preds = exp_preds / np.sum(exp_preds)
     probas = np.random.multinomial(1, preds, 1)
     return np.argmax(probas)
+
 
 def generate_text(seed, numlines, gfile, wseed=False):
     """
@@ -86,6 +86,7 @@ def generate_text(seed, numlines, gfile, wseed=False):
     gfile.write('\n')
     gfile.flush()
 
+
 def random_seed(chars, nchars):
     """
     Generates a random string
@@ -94,23 +95,23 @@ def random_seed(chars, nchars):
     """
     s = ""
     for i in range(nchars):
-        s += chars[random.randint(0, len(chars)-1)]
+        s += chars[random.randint(0, len(chars) - 1)]
 
     return s
 
+
 myseeds = ["behold the merry bride,\nwhite dress with yellow flowers,\nbright smile with sunny red,\nsweet my love ",
-"land and trees cast sunny shadows,\nchildren laughter, merry sound,\nyellow birds wear long feathers,\n"]
+           "land and trees cast sunny shadows,\nchildren laughter, merry sound,\nyellow birds wear long feathers,\n"]
 
 if __name__ == '__main__':
     ############################################
     # Data
 
-    path = 'poetry4.txt'
-    text = open(path).read().lower().decode('ascii', 'ignore')
+    path = 'poetry4.txt.gz'
+    text = gzip.open(path, 'rt').read().lower().replace('\ufeff', ' ')
     print('corpus length:', len(text))
 
     chars = sorted(list(set(text)))
-
     print('total chars:', len(chars))
     char_indices = dict((c, i) for i, c in enumerate(chars))
     indices_char = dict((i, c) for i, c in enumerate(chars))
@@ -134,7 +135,6 @@ if __name__ == '__main__':
             X[i, t, char_indices[char]] = 1
         y[i, char_indices[next_chars[i]]] = 1
 
-
     ############################################
     # Model
 
@@ -143,7 +143,7 @@ if __name__ == '__main__':
 
     RNN = LSTM  # GRU
     lsize = 64
-    nlayers = 2
+    nlayers = 3
     impl = 0
     dropout = 0.2
 
@@ -151,23 +151,24 @@ if __name__ == '__main__':
     if nlayers == 1:
         model.add(RNN(lsize, input_shape=(maxlen, len(chars)), implementation=impl, dropout=dropout))
     else:
-        model.add(RNN(lsize, input_shape=(maxlen, len(chars)), implementation=impl, dropout=dropout, return_sequences=True))
-        for i in range(1, nlayers-1):
+        model.add(
+            RNN(lsize, input_shape=(maxlen, len(chars)), implementation=impl, dropout=dropout, return_sequences=True))
+        for i in range(1, nlayers - 1):
             model.add(RNN(lsize, implementation=impl, dropout=dropout, return_sequences=True))
         model.add(RNN(lsize, implementation=impl, dropout=dropout))
     model.add(Dense(len(chars)))
     model.add(Activation('softmax'))
 
-
     ############################################
     # Training
-    #optimizer = RMSprop(lr=0.01)
+    # optimizer = RMSprop(lr=0.01)
     optimizer = SGD(lr=0.05, momentum=0.95)
     model.compile(loss='categorical_crossentropy', optimizer="adam")
 
     bsize = 256
     iterations = 50
     epoch_it = 10
+    verbose = 0  # 1
 
     # File for saving the generated text each iteration
     gfile = open('tgenerated-ML%d-S%d-NL%d-D%3.2f-BS%d.txt' % (maxlen, lsize, nlayers, dropout, bsize), 'w')
@@ -176,18 +177,18 @@ if __name__ == '__main__':
     for iteration in range(iterations):
         print()
         print('-' * 50)
-        print('Iteration', iteration+1)
+        print('Iteration', iteration + 1)
         model.fit(X, y,
                   batch_size=bsize,
-                  epochs=epoch_it)
+                  epochs=epoch_it,
+                  verbose=verbose)
 
         gfile.write('-' * 50)
         gfile.write('\n')
-        gfile.write('Iteration %d\n' % iteration+1)
+        gfile.write('Iteration %d\n' % iteration + 1)
         seed = random_seed(chars, maxlen)
         for diversity in [0.2, 0.3, 0.4]:
             gfile.write('\n\n')
             gfile.write('DIV = %3.2f\n\n' % diversity)
             generate_text(seed, 10, gfile, wseed=False)
     gfile.close()
- 

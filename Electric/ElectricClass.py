@@ -17,7 +17,6 @@ Process
 
 """
 
-from __future__ import print_function
 import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, Activation
@@ -32,17 +31,17 @@ if __name__ == '__main__':
 
     train = np.loadtxt('ElectricDevices_TRAIN.csv', delimiter=',')
     print(train.shape)
-    train_x =  train[:, 1:]
-    train_x = np.reshape(train_x,(train_x.shape[0], train_x.shape[1], 1))
+    train_x = train[:, 1:]
+    train_x = np.reshape(train_x, (train_x.shape[0], train_x.shape[1], 1))
     train_y = train[:, 0] - 1
-    #print(np.unique(train_y))
+    # print(np.unique(train_y))
     nclasses = len(np.unique(train_y))
     train_y_c = np_utils.to_categorical(train_y, nclasses)
-    test= np.loadtxt('ElectricDevices_TEST.csv', delimiter=',')
+    test = np.loadtxt('ElectricDevices_TEST.csv', delimiter=',')
 
     print(test.shape)
     test_x = test[:, 1:]
-    test_x = np.reshape(test_x,(test_x.shape[0], test_x.shape[1], 1))
+    test_x = np.reshape(test_x, (test_x.shape[0], test_x.shape[1], 1))
     test_y = test[:, 0] - 1
     test_y_c = np_utils.to_categorical(test_y, nclasses)
 
@@ -61,8 +60,9 @@ if __name__ == '__main__':
     if nlayers == 1:
         model.add(RNN(neurons, input_shape=(train_x.shape[1], 1), implementation=impl, dropout=drop))
     else:
-        model.add(RNN(neurons, input_shape=(train_x.shape[1], 1), implementation=impl, dropout=drop, return_sequences=True))
-        for i in range(1, nlayers-1):
+        model.add(
+            RNN(neurons, input_shape=(train_x.shape[1], 1), implementation=impl, dropout=drop, return_sequences=True))
+        for i in range(1, nlayers - 1):
             model.add(RNN(neurons, dropout=drop, implementation=impl, return_sequences=True))
 
         model.add(RNN(neurons, dropout=drop, implementation=impl))
@@ -70,20 +70,20 @@ if __name__ == '__main__':
     model.add(Dense(nclasses))
     model.add(Activation('softmax'))
 
-
     ############################################
     # Training
 
-    #optimizer = RMSprop(lr=0.01)
+    # optimizer = RMSprop(lr=0.01)
     optimizer = SGD(lr=0.01, momentum=0.95)
     model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 
     epochs = 50
     batch_size = 1000
+    verbose = 0  # 1
     model.fit(train_x, train_y_c,
-          batch_size=batch_size,
-          epochs=epochs,
-          validation_data=(test_x, test_y_c))
+              batch_size=batch_size,
+              epochs=epochs,
+              validation_data=(test_x, test_y_c), verbose=verbose)
 
     ############################################
     # Results
@@ -91,7 +91,7 @@ if __name__ == '__main__':
     score, acc = model.evaluate(test_x, test_y_c, batch_size=batch_size)
 
     print()
-    print('ACC= ',acc)
+    print('ACC= ', acc)
 
     test_pred = model.predict_classes(test_x)
 

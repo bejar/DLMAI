@@ -6,10 +6,6 @@ SentimentTwAir
 
 :Description: SentimentTwAir
 
-    
-
-:Authors: bejar
-    
 
 :Version: 
 
@@ -17,11 +13,9 @@ SentimentTwAir
 
 """
 
-from __future__ import print_function
 import pandas
 from sklearn.metrics import confusion_matrix, classification_report
 import re
-from nltk.corpus import stopwords
 import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Embedding
@@ -30,18 +24,18 @@ from keras.optimizers import RMSprop, SGD
 from keras.utils import np_utils
 from collections import Counter
 
+
 def tweet_to_words(raw_tweet):
     """
-    Only keeps ascii characters in the tweet and discards stopwords and @words
+    Only keeps ascii characters in the tweet and discards @words
 
     :param raw_tweet:
     :return:
     """
     letters_only = re.sub("[^a-zA-Z@]", " ", raw_tweet)
     words = letters_only.lower().split()
-    stops = set(stopwords.words("english"))
-    meaningful_words = [w for w in words if not w in stops and not re.match("^[@]", w)]
-    return( " ".join( meaningful_words ))
+    meaningful_words = [w for w in words if not re.match("^[@]", w)]
+    return " ".join(meaningful_words)
 
 
 if __name__ == '__main__':
@@ -51,19 +45,19 @@ if __name__ == '__main__':
     Tweet = pandas.read_csv("Airlines.csv")
     Tweet = pandas.read_csv("Presidential.csv")
 
-    #Pre-process the tweet and store in a separate column
+    # Pre-process the tweet and store in a separate column
     Tweet['clean_tweet'] = Tweet['text'].apply(lambda x: tweet_to_words(x))
-    #Convert sentiment to binary
+    # Convert sentiment to binary
     Tweet['sentiment'] = Tweet['twsentiment'].apply(lambda x: 0 if x == 'negative' else 1 if x == 'positive' else 2)
 
-    #Join all the words in review to build a corpus
+    # Join all the words in review to build a corpus
     all_text = ' '.join(Tweet['clean_tweet'])
     words = all_text.split()
 
     # Convert words to integers
     counts = Counter(words)
 
-    numwords = 5000 # Linit the number of words to use
+    numwords = 5000  # Limit the number of words to use
     vocab = sorted(counts, key=counts.get, reverse=True)[:numwords]
     vocab_to_int = {word: ii for ii, word in enumerate(vocab, 1)}
 
@@ -71,16 +65,16 @@ if __name__ == '__main__':
     for each in Tweet['clean_tweet']:
         tweet_ints.append([vocab_to_int[word] for word in each.split() if word in vocab_to_int])
 
-    #Create a list of labels
+    # Create a list of labels
     labels = np.array(Tweet['sentiment'])
 
-    #Find the number of tweets with zero length after the data pre-processing
+    # Find the number of tweets with zero length after the data pre-processing
     tweet_len = Counter([len(x) for x in tweet_ints])
     print("Zero-length reviews: {}".format(tweet_len[0]))
     print("Maximum tweet length: {}".format(max(tweet_len)))
 
-    #Remove those tweets with zero length and its correspoding label
-    tweet_idx  = [idx for idx,tweet in enumerate(tweet_ints) if len(tweet) > 0]
+    # Remove those tweets with zero length and its corresponding label
+    tweet_idx = [idx for idx, tweet in enumerate(tweet_ints) if len(tweet) > 0]
     labels = labels[tweet_idx]
     Tweet = Tweet.iloc[tweet_idx]
     tweet_ints = [tweet for tweet in tweet_ints if len(tweet) > 0]
@@ -91,11 +85,11 @@ if __name__ == '__main__':
         features[i, -len(row):] = np.array(row)[:seq_len]
 
     split_frac = 0.8
-    split_idx = int(len(features)*0.8)
+    split_idx = int(len(features) * 0.8)
     train_x, val_x = features[:split_idx], features[split_idx:]
     train_y, val_y = labels[:split_idx], labels[split_idx:]
 
-    test_idx = int(len(val_x)*0.5)
+    test_idx = int(len(val_x) * 0.5)
     val_x, test_x = val_x[:test_idx], val_x[test_idx:]
     val_y, test_y = val_y[:test_idx], val_y[test_idx:]
 
@@ -107,7 +101,6 @@ if __name__ == '__main__':
     print("Train set: \t\t{}".format(train_y.shape),
           "\nValidation set: \t{}".format(val_y.shape),
           "\nTest set: \t\t{}".format(test_y.shape))
-
 
     ############################################
     # Model
@@ -127,7 +120,7 @@ if __name__ == '__main__':
         model.add(RNN(neurons, implementation=impl, dropout=drop))
     else:
         model.add(RNN(neurons, implementation=impl, dropout=drop, return_sequences=True))
-        for i in range(1, nlayers-1):
+        for i in range(1, nlayers - 1):
             model.add(RNN(neurons, dropout=drop, implementation=impl, return_sequences=True))
         model.add(RNN(neurons, dropout=drop, implementation=impl))
 
@@ -143,6 +136,7 @@ if __name__ == '__main__':
 
     epochs = 50
     batch_size = 100
+    verbose = 0  # 1
 
     train_y_c = np_utils.to_categorical(train_y, 3)
     val_y_c = np_utils.to_categorical(val_y, 3)
@@ -150,18 +144,20 @@ if __name__ == '__main__':
     model.fit(train_x, train_y_c,
               batch_size=batch_size,
               epochs=epochs,
-              validation_data=(val_x, val_y_c))
+              validation_data=(val_x, val_y_c),
+              verbose=verbose)
 
     ############################################
     # Results
 
     test_y_c = np_utils.to_categorical(test_y, 3)
     score, acc = model.evaluate(test_x, test_y_c,
-                                batch_size=batch_size ,verbose=0)
+                                batch_size=batch_size,
+                                verbose=verbose)
     print()
     print('Test ACC=', acc)
 
-    test_pred = model.predict_classes(test_x ,verbose=0)
+    test_pred = model.predict_classes(test_x, verbose=verbose)
 
     print()
     print(confusion_matrix(test_y, test_pred))
