@@ -177,7 +177,7 @@ if __name__ == '__main__':
     for iteration in range(iterations):
         print()
         print('-' * 50)
-        print('Iteration', iteration + 1)
+        print('Iteration %d' %(iteration + 1))
         model.fit(X, y,
                   batch_size=bsize,
                   epochs=epoch_it,
