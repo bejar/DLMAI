@@ -23,6 +23,7 @@ from keras.layers import LSTM, GRU
 from keras.optimizers import RMSprop, SGD
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
+import argparse
 
 __author__ = 'bejar'
 
@@ -42,6 +43,13 @@ def lagged_vector(data, lag=1):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--verbose', help="Verbose output (enables Keras verbose output)", action='store_true', default=False)
+    args = parser.parse_args()
+
+    if args.verbose:
+        verbose = 1
+
     ############################################
     # Data
 
@@ -98,7 +106,6 @@ if __name__ == '__main__':
 
     batch_size = 1000
     nepochs = 50
-    verbose = 0  # 1
 
     model.fit(train_x, train_y,
               batch_size=batch_size,

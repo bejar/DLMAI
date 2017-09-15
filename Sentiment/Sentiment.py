@@ -23,6 +23,7 @@ from keras.layers import LSTM
 from keras.optimizers import RMSprop, SGD
 from keras.utils import np_utils
 from collections import Counter
+import argparse
 
 
 def tweet_to_words(raw_tweet):
@@ -39,6 +40,13 @@ def tweet_to_words(raw_tweet):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--verbose', help="Verbose output (enables Keras verbose output)", action='store_true', default=False)
+    args = parser.parse_args()
+
+    if args.verbose:
+        verbose = 1
+
     ############################################
     # Data
 
@@ -136,7 +144,6 @@ if __name__ == '__main__':
 
     epochs = 50
     batch_size = 100
-    verbose = 0  # 1
 
     train_y_c = np_utils.to_categorical(train_y, 3)
     val_y_c = np_utils.to_categorical(val_y, 3)

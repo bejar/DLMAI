@@ -24,8 +24,16 @@ from keras.layers import LSTM
 from keras.optimizers import RMSprop, SGD
 from keras.utils import np_utils
 from sklearn.metrics import confusion_matrix, classification_report
+import argparse
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--verbose', help="Verbose output (enables Keras verbose output)", action='store_true', default=False)
+    args = parser.parse_args()
+
+    if args.verbose:
+        verbose = 1
+
     ############################################
     # Data
 
@@ -79,7 +87,6 @@ if __name__ == '__main__':
 
     epochs = 50
     batch_size = 1000
-    verbose = 0  # 1
     model.fit(train_x, train_y_c,
               batch_size=batch_size,
               epochs=epochs,

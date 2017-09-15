@@ -23,6 +23,7 @@ from keras.models import Sequential
 from keras import layers
 import numpy as np
 from six.moves import range
+import argparse
 
 
 class CharacterTable(object):
@@ -58,6 +59,13 @@ class CharacterTable(object):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--verbose', help="Verbose output (enables Keras verbose output)", action='store_true', default=False)
+    args = parser.parse_args()
+
+    if args.verbose:
+        verbose = 1
+
     ############################################
     # Data
 
@@ -174,8 +182,7 @@ if __name__ == '__main__':
     # Train the model each generation and show predictions against the validation
     # dataset.
 
-    verbose = 0  # 1
-    iterations = 5
+    iterations = 50
     for iteration in range(1, iterations + 1):
         print()
         print('-' * 50)

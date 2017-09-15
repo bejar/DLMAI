@@ -24,7 +24,7 @@ from keras.optimizers import RMSprop, SGD
 import numpy as np
 import random
 import gzip
-
+import argparse
 
 def sample(preds, temperature=1.0):
     """
@@ -50,15 +50,10 @@ def generate_text(seed, numlines, gfile, wseed=False):
     :param lines:
     :return:
     """
-    print()
-    print('----- diversity:', diversity)
-
     generated = ''
     gprinted = ''
     sentence = seed
     generated += sentence
-    # print('----- Generating with seed: "' + sentence + '"')
-    # sys.stdout.write(generated)
 
     nlines = 0
     for i in range(1000):
@@ -104,6 +99,13 @@ myseeds = ["behold the merry bride,\nwhite dress with yellow flowers,\nbright sm
            "land and trees cast sunny shadows,\nchildren laughter, merry sound,\nyellow birds wear long feathers,\n"]
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--verbose', help="Verbose output (enables Keras verbose output)", action='store_true', default=False)
+    args = parser.parse_args()
+
+    if args.verbose:
+        verbose = 1
+
     ############################################
     # Data
 
@@ -168,7 +170,6 @@ if __name__ == '__main__':
     bsize = 256
     iterations = 50
     epoch_it = 10
-    verbose = 1  # 1
 
     # File for saving the generated text each iteration
     gfile = open('tgenerated-ML%d-S%d-NL%d-D%3.2f-BS%d.txt' % (maxlen, lsize, nlayers, dropout, bsize), 'w')
