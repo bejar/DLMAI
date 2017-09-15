@@ -168,7 +168,7 @@ if __name__ == '__main__':
     bsize = 256
     iterations = 50
     epoch_it = 10
-    verbose = 0  # 1
+    verbose = 1  # 1
 
     # File for saving the generated text each iteration
     gfile = open('tgenerated-ML%d-S%d-NL%d-D%3.2f-BS%d.txt' % (maxlen, lsize, nlayers, dropout, bsize), 'w')
@@ -185,7 +185,7 @@ if __name__ == '__main__':
 
         gfile.write('-' * 50)
         gfile.write('\n')
-        gfile.write('Iteration %d\n' % iteration + 1)
+        gfile.write('Iteration %d\n' % (iteration + 1))
         seed = random_seed(chars, maxlen)
         for diversity in [0.2, 0.3, 0.4]:
             gfile.write('\n\n')
