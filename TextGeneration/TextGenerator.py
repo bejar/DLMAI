@@ -101,10 +101,11 @@ myseeds = ["behold the merry bride,\nwhite dress with yellow flowers,\nbright sm
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--verbose', help="Verbose output (enables Keras verbose output)", action='store_true', default=False)
+    parser.add_argument('--gpu', help="Use LSTM/GRU grpu implementation", action='store_true', default=False)
     args = parser.parse_args()
 
-    if args.verbose:
-        verbose = 1
+    verbose = 1 if args.verbose else 0
+    impl = 2 if args.gpu else 0
 
     ############################################
     # Data
@@ -145,8 +146,7 @@ if __name__ == '__main__':
 
     RNN = LSTM  # GRU
     lsize = 64
-    nlayers = 3
-    impl = 0
+    nlayers = 4
     dropout = 0.2
 
     model = Sequential()

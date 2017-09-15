@@ -29,10 +29,11 @@ import argparse
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--verbose', help="Verbose output (enables Keras verbose output)", action='store_true', default=False)
+    parser.add_argument('--gpu', help="Use LSTM/GRU grpu implementation", action='store_true', default=False)
     args = parser.parse_args()
 
-    if args.verbose:
-        verbose = 1
+    verbose = 1 if args.verbose else 0
+    impl = 2 if args.gpu else 0
 
     ############################################
     # Data
@@ -58,8 +59,6 @@ if __name__ == '__main__':
 
     RNN = LSTM  # GRU
     neurons = 64
-
-    impl = 0  # 0 for CPU, 2 for GPU
     drop = 0.2
     nlayers = 2  # >= 1
 

@@ -61,10 +61,11 @@ class CharacterTable(object):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--verbose', help="Verbose output (enables Keras verbose output)", action='store_true', default=False)
+    parser.add_argument('--gpu', help="Use LSTM/GRU grpu implementation", action='store_true', default=False)
     args = parser.parse_args()
 
-    if args.verbose:
-        verbose = 1
+    verbose = 1 if args.verbose else 0
+    impl = 2 if args.gpu else 0
 
     ############################################
     # Data
@@ -153,7 +154,7 @@ if __name__ == '__main__':
     # "Encode" the input sequence using an RNN, producing an output of HIDDEN_SIZE.
     # Note: In a situation where your input sequences have a variable length,
     # use input_shape=(None, num_feature).
-    model.add(RNN(HIDDEN_SIZE, input_shape=(MAXLEN, len(chars)), dropout=Dropout))
+    model.add(RNN(HIDDEN_SIZE, input_shape=(MAXLEN, len(chars)), dropout=Dropout, implementation=impl))
     # As the decoder RNN's input, repeatedly provide with the last hidden state of
     # RNN for each time step. Repeat 'DIGITS + 1' times as that's the maximum
     # length of output, e.g., when DIGITS=3, max output is 999+999=1998.
@@ -164,7 +165,7 @@ if __name__ == '__main__':
         # all the outputs so far in the form of (num_samples, timesteps,
         # output_dim). This is necessary as TimeDistributed in the below expects
         # the first dimension to be the timesteps.
-        model.add(RNN(HIDDEN_SIZE, return_sequences=True, dropout=Dropout))
+        model.add(RNN(HIDDEN_SIZE, return_sequences=True, dropout=Dropout, implementation=impl))
 
     # Apply a dense layer to the every temporal slice of an input. For each of step
     # of the output sequence, decide which character should be chosen.
