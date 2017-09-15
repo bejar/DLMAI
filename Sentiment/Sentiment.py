@@ -122,7 +122,7 @@ if __name__ == '__main__':
     embedding = 40
 
     model = Sequential()
-    model.add(Embedding(len(tweet_ints), embedding))
+    model.add(Embedding(numwords + 1, embedding, input_length=seq_len))
 
     if nlayers == 1:
         model.add(RNN(neurons, implementation=impl, dropout=drop))
