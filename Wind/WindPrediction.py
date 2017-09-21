@@ -60,7 +60,6 @@ if __name__ == '__main__':
     wind = np.load('Wind.npz')
     print(wind.files)
     wind = wind['90-45142']
-    print(wind.shape)
     wind = wind[:, 0]
 
     scaler = StandardScaler()
@@ -126,8 +125,6 @@ if __name__ == '__main__':
     print('MSE= ', score)
     print ('MSE persistence =', mean_squared_error(test_y[1:], test_y[0:-1]))
     print(test_y.shape, test_predict.shape)
-    z = (test_y - test_predict)
-    print (z[:10])
 
     if verbose:
         plt.subplot(2, 1, 1)
