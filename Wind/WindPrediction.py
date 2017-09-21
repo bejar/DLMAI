@@ -82,7 +82,7 @@ if __name__ == '__main__':
     # Model
 
     neurons = 64
-    drop = 0.2
+    drop = 0.0
     nlayers = 3  # >= 1
     RNN = LSTM  # GRU
 

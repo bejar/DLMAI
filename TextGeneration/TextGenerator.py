@@ -121,7 +121,7 @@ if __name__ == '__main__':
 
     # cut the text in semi-redundant sequences of maxlen characters
     maxlen = 40
-    step = 3
+    step = 2
     sentences = []
     next_chars = []
     for i in range(0, len(text) - maxlen, step):
@@ -146,8 +146,8 @@ if __name__ == '__main__':
 
     RNN = LSTM  # GRU
     lsize = 64
-    nlayers = 4
-    dropout = 0.2
+    nlayers = 3
+    dropout = 0
 
     model = Sequential()
     if nlayers == 1:

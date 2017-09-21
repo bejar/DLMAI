@@ -113,7 +113,7 @@ if __name__ == '__main__':
 
     ############################################
     # Model
-    drop = 0.2
+    drop = 0.0
     nlayers = 2  # >= 1
     RNN = LSTM  # GRU
 

@@ -147,7 +147,7 @@ if __name__ == '__main__':
     HIDDEN_SIZE = 128
     BATCH_SIZE = 128
     LAYERS = 1
-    Dropout = 0.2
+    Dropout = 0.0
 
     print('Build model...')
     model = Sequential()

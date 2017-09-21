@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
     RNN = LSTM  # GRU
     neurons = 64
-    drop = 0.2
+    drop = 0.0
     nlayers = 2  # >= 1
 
     model = Sequential()
