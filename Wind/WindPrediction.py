@@ -23,6 +23,7 @@ from keras.layers import LSTM, GRU
 from keras.optimizers import RMSprop, SGD
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import mean_squared_error
 import argparse
 
 __author__ = 'bejar'
@@ -123,7 +124,7 @@ if __name__ == '__main__':
                            verbose=verbose)
 
     print('MSE= ', score)
-
+    print ('MSE persistence =', mean_squared_error(test_y[1:], test_y[0:-1]))
     print(test_y.shape, test_predict.shape)
     z = (test_y - test_predict)
     print (z[:10])
