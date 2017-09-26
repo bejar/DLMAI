@@ -73,7 +73,12 @@ if __name__ == '__main__':
 
     wind_test = wind[200000:, 0]
     test = lagged_vector(wind_test, lag=lag)
-    test_x, test_y = test[:, :-1], test[:,-1]
+    half_test = int(test.shape[0]/2)
+
+    val_x, val_y = test[half_test:, :-1], test[half_test:,-1]
+    test_x = np.reshape(val_x, (val_x.shape[0], val_x.shape[1], 1))
+
+    test_x, test_y = test[half_test:, :-1], test[half_test:,-1]
     test_x = np.reshape(test_x, (test_x.shape[0], test_x.shape[1], 1))
 
     print(train_x.shape, test_x.shape)
@@ -102,7 +107,7 @@ if __name__ == '__main__':
     # Training
 
     optimizer = RMSprop(lr=0.00001)
-    model.compile(loss='mean_squared_error', optimizer=optimizer)
+    model.compile(loss='mean_squared_error', optimizer=optimizer, validation_data=(val_x, val_y))
 
     batch_size = 1000
     nepochs = 50
@@ -115,7 +120,7 @@ if __name__ == '__main__':
     ############################################
     # Results
 
-    train_predict = model.predict(train_x).flatten()
+    #train_predict = model.predict(train_x).flatten()
     test_predict = model.predict(test_x).flatten()
 
     score = model.evaluate(test_x, test_y,
