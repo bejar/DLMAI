@@ -75,7 +75,7 @@ if __name__ == '__main__':
     test = lagged_vector(wind_test, lag=lag)
     half_test = int(test.shape[0]/2)
 
-    val_x, val_y = test[half_test:, :-1], test[half_test:,-1]
+    val_x, val_y = test[:half_test, :-1], test[:half_test,-1]
     test_x = np.reshape(val_x, (val_x.shape[0], val_x.shape[1], 1))
 
     test_x, test_y = test[half_test:, :-1], test[half_test:,-1]
