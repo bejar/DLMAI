@@ -172,7 +172,7 @@ if __name__ == '__main__':
     epoch_it = 10
 
     # File for saving the generated text each iteration
-    gfile = open('tgenerated-ML%d-S%d-NL%d-D%3.2f-BS%d.txt' % (maxlen, lsize, nlayers, dropout, bsize), 'w')
+    gfile = open('tgenerated-TXT%s-ML%d-S%d-NL%d-D%3.2f-BS%d.txt' % (path.split()[0], maxlen, lsize, nlayers, dropout, bsize), 'w')
 
     # train the model, output generated text after each iteration
     for iteration in range(iterations):
