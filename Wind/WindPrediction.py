@@ -126,21 +126,25 @@ if __name__ == '__main__':
     ############################################
     # Results
 
-    #train_predict = model.predict(train_x).flatten()
+    val_predict = model.predict(val_x).flatten()
     test_predict = model.predict(test_x).flatten()
+
+    score = model.evaluate(val_x, val_y,
+                           batch_size=batch_size,
+                           verbose=verbose)
+    print('MSE Val= ', score)
+    print ('MSE Val persistence =', mean_squared_error(val_y[1:], val_y[0:-1]))
 
     score = model.evaluate(test_x, test_y,
                            batch_size=batch_size,
                            verbose=verbose)
+    print('MSE Test= ', score)
+    print ('MSE Test persistence =', mean_squared_error(test_y[1:], test_y[0:-1]))
 
-    print('MSE= ', score)
-    print ('MSE persistence =', mean_squared_error(test_y[1:], test_y[0:-1]))
-    print(test_y.shape, test_predict.shape)
-
-    if verbose:
-        plt.subplot(2, 1, 1)
-        plt.plot(test_predict, color='r')
-        plt.plot(test_y, color='b')
-        plt.subplot(2, 1, 2)
-        plt.plot(test_y - test_predict, color='r')
-        plt.show()
+    # if verbose:
+    #     plt.subplot(2, 1, 1)
+    #     plt.plot(test_predict, color='r')
+    #     plt.plot(test_y, color='b')
+    #     plt.subplot(2, 1, 2)
+    #     plt.plot(test_y - test_predict, color='r')
+    #     plt.show()
