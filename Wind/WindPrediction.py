@@ -157,13 +157,13 @@ if __name__ == '__main__':
 
     score = model.evaluate(val_x, val_y,
                            batch_size=batch_size,
-                           verbose=verbose)
+                           verbose=0)
     print('MSE Val= ', score)
     print ('MSE Val persistence =', mean_squared_error(val_y[1:], val_y[0:-1]))
 
     score = model.evaluate(test_x, test_y,
                            batch_size=batch_size,
-                           verbose=verbose)
+                           verbose=0)
     print('MSE Test= ', score)
     print ('MSE Test persistence =', mean_squared_error(test_y[1:], test_y[0:-1]))
 
