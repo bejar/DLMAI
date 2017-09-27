@@ -135,6 +135,8 @@ if __name__ == '__main__':
                       activation=activation, recurrent_activation=activation_r))
     model.add(Dense(1))
 
+    print('lag: ', lag, 'Neurons: ', neurons, 'Layers: ', nlayers, activation, activation_r)
+    print()
 
     ############################################
     # Training
@@ -152,9 +154,6 @@ if __name__ == '__main__':
 
     ############################################
     # Results
-
-    print('lag: ', lag, 'Neurons: ', neurons, 'Layers: ', nlayers, activation, activation_r)
-    print()
 
     score = model.evaluate(val_x, val_y,
                            batch_size=batch_size,
