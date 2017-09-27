@@ -1,0 +1,13 @@
+{
+  "datasize": 200000,
+  "testsize": 40000,
+  "lag": 6,
+  "neurons": 512,
+  "drop": 0.0,
+  "nlayers": 1,
+  "activation": "relu",
+  "activation_r": "sigmoid",
+  "rnn": "LSTM",
+  "batch": 1000,
+  "epochs": 20
+}

@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error
 import argparse
+import json
 
 __author__ = 'bejar'
 
@@ -42,6 +43,24 @@ def lagged_vector(data, lag=1):
     lvect.append(data[lag:])
     return np.stack(lvect, axis=1)
 
+def load_config_file(nfile, abspath=False):
+    """
+    Read the configuration from a json file
+
+    :param abspath:
+    :param nfile:
+    :return:
+    """
+    ext = '.json' if 'json' not in nfile else ''
+    pre = '' if abspath else './'
+    fp = open(pre + nfile + ext, 'r')
+
+    s = ''
+
+    for l in fp:
+        s += l
+
+    return json.loads(s)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -51,6 +70,8 @@ if __name__ == '__main__':
 
     verbose = 1 if args.verbose else 0
     impl = 2 if args.gpu else 0
+
+    config = load_config_file(args.config)
 
     ############################################
     # Data
@@ -66,11 +87,11 @@ if __name__ == '__main__':
     wind = scaler.fit_transform(wind.reshape(-1, 1))
 
     # Size of the training and size for validatio+test set (half for validation, half for test)
-    datasize = 200000
-    testsize = 40000
+    datasize = config['datasize']
+    testsize = config['testsize']
 
     # Length of the lag for the training window
-    lag = 10
+    lag = config['lag']
 
     wind_train = wind[:datasize, 0]
     train = lagged_vector(wind_train, lag=lag)
@@ -92,20 +113,26 @@ if __name__ == '__main__':
     ############################################
     # Model
 
-    neurons = 64
-    drop = 0.0
-    nlayers = 3  # >= 1
-    RNN = LSTM  # GRU
+    neurons = config['neurons']
+    drop = config['drop']
+    nlayers = config['nlayers']
+    RNN = LSTM if config['rnn'] == 'LSTM' else GRU
 
+    activation = config['activation']
+    activation_r = config['activation_r']
 
     model = Sequential()
     if nlayers == 1:
-        model.add(RNN(neurons, input_shape=(train_x.shape[1], 1), implementation=impl, dropout=drop))
+        model.add(RNN(neurons, input_shape=(train_x.shape[1], 1), implementation=impl, dropout=drop,
+                      activation=activation, recurrent_activation=activation_r))
     else:
-        model.add(RNN(neurons, input_shape=(train_x.shape[1], 1), implementation=impl, dropout=drop, return_sequences=True))
+        model.add(RNN(neurons, input_shape=(train_x.shape[1], 1), implementation=impl, dropout=drop,
+                      activation=activation, recurrent_activation=activation_r, return_sequences=True))
         for i in range(1, nlayers-1):
-            model.add(RNN(neurons, dropout=drop, implementation=impl, return_sequences=True))
-        model.add(RNN(neurons, dropout=drop, implementation=impl))
+            model.add(RNN(neurons, dropout=drop, implementation=impl,
+                          activation=activation, recurrent_activation=activation_r, return_sequences=True))
+        model.add(RNN(neurons, dropout=drop, implementation=impl,
+                      activation=activation, recurrent_activation=activation_r))
     model.add(Dense(1))
 
 
@@ -115,8 +142,8 @@ if __name__ == '__main__':
     optimizer = RMSprop(lr=0.00001)
     model.compile(loss='mean_squared_error', optimizer=optimizer, validation_data=(val_x, val_y))
 
-    batch_size = 1000
-    nepochs = 20
+    batch_size = config['batch']
+    nepochs = config['epochs']
 
     model.fit(train_x, train_y,
               batch_size=batch_size,
@@ -126,8 +153,8 @@ if __name__ == '__main__':
     ############################################
     # Results
 
-    val_predict = model.predict(val_x).flatten()
-    test_predict = model.predict(test_x).flatten()
+    print('lag: ', lag, 'Neurons: ', neurons, 'Layers: ', nlayers, activation, activation_r)
+    print()
 
     score = model.evaluate(val_x, val_y,
                            batch_size=batch_size,
