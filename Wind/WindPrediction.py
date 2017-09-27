@@ -65,13 +65,19 @@ if __name__ == '__main__':
     scaler = StandardScaler()
     wind = scaler.fit_transform(wind.reshape(-1, 1))
 
+    # Size of the training and size for validatio+test set (half for validation, half for test)
+    datasize = 200000
+    testsize = 40000
+
+    # Length of the lag for the training window
     lag = 10
-    wind_train = wind[:200000, 0]
+
+    wind_train = wind[:datasize, 0]
     train = lagged_vector(wind_train, lag=lag)
     train_x, train_y = train[:, :-1], train[:,-1]
     train_x = np.reshape(train_x, (train_x.shape[0], train_x.shape[1], 1))
 
-    wind_test = wind[200000:, 0]
+    wind_test = wind[datasize:datasize+testsize, 0]
     test = lagged_vector(wind_test, lag=lag)
     half_test = int(test.shape[0]/2)
 
@@ -110,7 +116,7 @@ if __name__ == '__main__':
     model.compile(loss='mean_squared_error', optimizer=optimizer, validation_data=(val_x, val_y))
 
     batch_size = 1000
-    nepochs = 50
+    nepochs = 20
 
     model.fit(train_x, train_y,
               batch_size=batch_size,
