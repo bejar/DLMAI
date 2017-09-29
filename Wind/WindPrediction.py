@@ -26,6 +26,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error
 import argparse
 import json
+import time
 
 __author__ = 'bejar'
 
@@ -64,6 +65,7 @@ def load_config_file(nfile, abspath=False):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--config', default='config', help='Experiment configuration')
     parser.add_argument('--verbose', help="Verbose output (enables Keras verbose output)", action='store_true', default=False)
     parser.add_argument('--gpu', help="Use LSTM/GRU grpu implementation", action='store_true', default=False)
     args = parser.parse_args()
@@ -72,6 +74,8 @@ if __name__ == '__main__':
     impl = 2 if args.gpu else 0
 
     config = load_config_file(args.config)
+
+    print("Starting:", time.ctime())
 
     ############################################
     # Data
@@ -103,12 +107,10 @@ if __name__ == '__main__':
     half_test = int(test.shape[0]/2)
 
     val_x, val_y = test[:half_test, :-1], test[:half_test,-1]
-    test_x = np.reshape(val_x, (val_x.shape[0], val_x.shape[1], 1))
+    val_x = np.reshape(val_x, (val_x.shape[0], val_x.shape[1], 1))
 
     test_x, test_y = test[half_test:, :-1], test[half_test:,-1]
     test_x = np.reshape(test_x, (test_x.shape[0], test_x.shape[1], 1))
-
-    print(train_x.shape, test_x.shape)
 
     ############################################
     # Model
@@ -141,8 +143,8 @@ if __name__ == '__main__':
     ############################################
     # Training
 
-    optimizer = RMSprop(lr=0.00001)
-    model.compile(loss='mean_squared_error', optimizer=optimizer, validation_data=(val_x, val_y))
+    optimizer = RMSprop(lr=0.0001)
+    model.compile(loss='mean_squared_error', optimizer=optimizer)
 
     batch_size = config['batch']
     nepochs = config['epochs']
@@ -150,11 +152,12 @@ if __name__ == '__main__':
     model.fit(train_x, train_y,
               batch_size=batch_size,
               epochs=nepochs,
-              verbose=verbose)
+              verbose=verbose, validation_data=(val_x, val_y))
 
     ############################################
     # Results
 
+    print()
     score = model.evaluate(val_x, val_y,
                            batch_size=batch_size,
                            verbose=0)
@@ -166,11 +169,5 @@ if __name__ == '__main__':
                            verbose=0)
     print('MSE Test= ', score)
     print ('MSE Test persistence =', mean_squared_error(test_y[1:], test_y[0:-1]))
-
-    # if verbose:
-    #     plt.subplot(2, 1, 1)
-    #     plt.plot(test_predict, color='r')
-    #     plt.plot(test_y, color='b')
-    #     plt.subplot(2, 1, 2)
-    #     plt.plot(test_y - test_predict, color='r')
-    #     plt.show()
+    print()
+    print("Ending:", time.ctime())

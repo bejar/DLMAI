@@ -25,6 +25,7 @@ import numpy as np
 import random
 import gzip
 import argparse
+import time
 
 def sample(preds, temperature=1.0):
     """
@@ -107,10 +108,12 @@ if __name__ == '__main__':
     verbose = 1 if args.verbose else 0
     impl = 2 if args.gpu else 0
 
+    print("Starting:", time.ctime())
+
     ############################################
     # Data
 
-    path = 'poetry4.txt.gz'
+    path = 'poetry1.txt.gz'
     text = gzip.open(path, 'rt').read().lower().replace('\ufeff', ' ')
     print('corpus length:', len(text))
 
@@ -120,8 +123,8 @@ if __name__ == '__main__':
     indices_char = dict((i, c) for i, c in enumerate(chars))
 
     # cut the text in semi-redundant sequences of maxlen characters
-    maxlen = 40
-    step = 2
+    maxlen = 50
+    step = 3
     sentences = []
     next_chars = []
     for i in range(0, len(text) - maxlen, step):
@@ -146,7 +149,7 @@ if __name__ == '__main__':
 
     RNN = LSTM  # GRU
     lsize = 64
-    nlayers = 3
+    nlayers = 1
     dropout = 0
 
     model = Sequential()
@@ -168,7 +171,7 @@ if __name__ == '__main__':
     model.compile(loss='categorical_crossentropy', optimizer="adam")
 
     bsize = 256
-    iterations = 50
+    iterations = 10
     epoch_it = 10
 
     # File for saving the generated text each iteration
@@ -186,10 +189,14 @@ if __name__ == '__main__':
 
         gfile.write('-' * 50)
         gfile.write('\n')
+        gfile.write(time.ctime())
+        gfile.write('\n')
         gfile.write('Iteration %d\n' % (iteration + 1))
         seed = random_seed(chars, maxlen)
-        for diversity in [0.2, 0.3, 0.4]:
+        for diversity in [0.2, 0.4, 0.8, 1.0]:
             gfile.write('\n\n')
             gfile.write('DIV = %3.2f\n\n' % diversity)
-            generate_text(seed, 10, gfile, wseed=False)
+            generate_text(seed, numlines=10, gfile=gfile, wseed=False)
     gfile.close()
+    print()
+    print("Ending:", time.ctime())

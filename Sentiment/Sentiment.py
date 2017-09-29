@@ -24,6 +24,7 @@ from keras.optimizers import RMSprop, SGD
 from keras.utils import np_utils
 from collections import Counter
 import argparse
+import time
 
 
 def tweet_to_words(raw_tweet):
@@ -47,6 +48,8 @@ if __name__ == '__main__':
 
     verbose = 1 if args.verbose else 0
     impl = 2 if args.gpu else 0
+
+    print("Starting:", time.ctime())
 
     ############################################
     # Data
@@ -166,5 +169,12 @@ if __name__ == '__main__':
     test_pred = model.predict_classes(test_x, verbose=verbose)
 
     print()
+    print('Confusion Matrix')
+    print('-'*20)
     print(confusion_matrix(test_y, test_pred))
+    print()
+    print('Classification Report')
+    print('-'*40)
     print(classification_report(test_y, test_pred))
+    print()
+    print("Ending:", time.ctime())

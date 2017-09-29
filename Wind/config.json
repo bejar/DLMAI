@@ -1,6 +1,6 @@
 {
-  "datasize": 200000,
-  "testsize": 40000,
+  "datasize": 50000,
+  "testsize": 20000,
   "lag": 6,
   "neurons": 512,
   "drop": 0.0,
@@ -9,5 +9,5 @@
   "activation_r": "sigmoid",
   "rnn": "LSTM",
   "batch": 1000,
-  "epochs": 20
+  "epochs": 50
 }

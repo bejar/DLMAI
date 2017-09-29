@@ -24,6 +24,7 @@ from keras import layers
 import numpy as np
 from six.moves import range
 import argparse
+import time
 
 
 class CharacterTable(object):
@@ -66,6 +67,8 @@ if __name__ == '__main__':
 
     verbose = 1 if args.verbose else 0
     impl = 2 if args.gpu else 0
+
+    print("Starting:", time.ctime())
 
     ############################################
     # Data
@@ -209,3 +212,5 @@ if __name__ == '__main__':
                 print('-', end=" ")
             print(guess)
         print('---')
+    print()
+    print("Ending:", time.ctime())
