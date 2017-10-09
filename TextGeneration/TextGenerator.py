@@ -113,7 +113,7 @@ if __name__ == '__main__':
     ############################################
     # Data
 
-    path = 'poetry1.txt.gz'
+    path = 'orig.txt.gz'
     text = gzip.open(path, 'rt').read().lower().replace('\ufeff', ' ')
     print('corpus length:', len(text))
 
