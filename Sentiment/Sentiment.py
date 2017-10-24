@@ -43,7 +43,7 @@ def tweet_to_words(raw_tweet):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--verbose', help="Verbose output (enables Keras verbose output)", action='store_true', default=False)
-    parser.add_argument('--gpu', help="Use LSTM/GRU grpu implementation", action='store_true', default=False)
+    parser.add_argument('--gpu', help="Use LSTM/GRU gpu implementation", action='store_true', default=False)
     args = parser.parse_args()
 
     verbose = 1 if args.verbose else 0
