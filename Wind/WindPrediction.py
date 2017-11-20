@@ -77,7 +77,7 @@ if __name__ == '__main__':
 
     print("Starting:", time.ctime())
 
-    ############################################
+    ###########################################
     # Data
 
     vars = {0: 'wind_speed', 1: 'air_density', 2: 'temperature', 3: 'pressure'}
