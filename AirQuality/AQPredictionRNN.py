@@ -117,31 +117,33 @@ def _generate_dataset_one_var(data, datasize, testsize, lag=1, ahead=1):
     return train_x, train_y, test_x, test_y
 
 
-def generate_dataset(config, dataset, lag, ahead=1, data_path=None):
+def generate_dataset(config, ahead=1, data_path=None):
     """
     Generates the dataset for training, test and validation
 
-    :param lag: length of the lag window
     :param ahead: number of steps ahead for prediction
 
     :return:
     """
+    dataset = config['dataset']
     datanames = config['datanames']
     datasize = config['datasize']
     testsize = config['testsize']
     vars = config['vars']
-    wind = {}
+    lag = config['lag']
+
+    airq = {}
 
     # Reads numpy arrays for all sites and keep only selected columns
 
     aqdata = np.load(data_path + 'LondonAQ.npz')
     for d in datanames:
-        wind[d] = aqdata[d]
+        airq[d] = aqdata[d]
         if vars is not None:
-            wind[d] = wind[d][:, vars]
+            airq[d] = airq[d][:, vars]
 
     if dataset == 0:
-        return _generate_dataset_one_var(wind[datanames[0]][:, 0].reshape(-1, 1), datasize, testsize,
+        return _generate_dataset_one_var(airq[datanames[0]][:, 0].reshape(-1, 1), datasize, testsize,
                                          lag=lag, ahead=ahead)
     # Just add more options to generate datasets with more than one variable for predicting one value
     # or a sequence of values
