@@ -127,12 +127,12 @@ if __name__ == '__main__':
     model.add(Embedding(numwords + 1, embedding, input_length=seq_len))
 
     if nlayers == 1:
-        model.add(RNN(neurons, implementation=impl, dropout=drop))
+        model.add(RNN(neurons, implementation=impl, recurrent_dropout=drop))
     else:
-        model.add(RNN(neurons, implementation=impl, dropout=drop, return_sequences=True))
+        model.add(RNN(neurons, implementation=impl, recurrent_dropout=drop, return_sequences=True))
         for i in range(1, nlayers - 1):
-            model.add(RNN(neurons, dropout=drop, implementation=impl, return_sequences=True))
-        model.add(RNN(neurons, dropout=drop, implementation=impl))
+            model.add(RNN(neurons, recurrent_dropout=drop, implementation=impl, return_sequences=True))
+        model.add(RNN(neurons, recurrent_dropout=drop, implementation=impl))
 
     model.add(Dense(3))
     model.add(Activation('softmax'))

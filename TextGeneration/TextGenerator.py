@@ -154,13 +154,13 @@ if __name__ == '__main__':
 
     model = Sequential()
     if nlayers == 1:
-        model.add(RNN(lsize, input_shape=(maxlen, len(chars)), implementation=impl, dropout=dropout))
+        model.add(RNN(lsize, input_shape=(maxlen, len(chars)), implementation=impl, recurrent_dropout=dropout))
     else:
         model.add(
-            RNN(lsize, input_shape=(maxlen, len(chars)), implementation=impl, dropout=dropout, return_sequences=True))
+            RNN(lsize, input_shape=(maxlen, len(chars)), implementation=impl, recurrent_dropout=dropout, return_sequences=True))
         for i in range(1, nlayers - 1):
-            model.add(RNN(lsize, implementation=impl, dropout=dropout, return_sequences=True))
-        model.add(RNN(lsize, implementation=impl, dropout=dropout))
+            model.add(RNN(lsize, implementation=impl, recurrent_dropout=dropout, return_sequences=True))
+        model.add(RNN(lsize, implementation=impl, recurrent_dropout=dropout))
     model.add(Dense(len(chars)))
     model.add(Activation('softmax'))
 

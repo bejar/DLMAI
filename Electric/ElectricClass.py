@@ -68,14 +68,14 @@ if __name__ == '__main__':
     model = Sequential()
 
     if nlayers == 1:
-        model.add(RNN(neurons, input_shape=(train_x.shape[1], 1), implementation=impl, dropout=drop))
+        model.add(RNN(neurons, input_shape=(train_x.shape[1], 1), implementation=impl, recurrent_dropout=drop))
     else:
         model.add(
-            RNN(neurons, input_shape=(train_x.shape[1], 1), implementation=impl, dropout=drop, return_sequences=True))
+            RNN(neurons, input_shape=(train_x.shape[1], 1), implementation=impl, recurrent_dropout=drop, return_sequences=True))
         for i in range(1, nlayers - 1):
-            model.add(RNN(neurons, dropout=drop, implementation=impl, return_sequences=True))
+            model.add(RNN(neurons, recurrent_dropout=drop, implementation=impl, return_sequences=True))
 
-        model.add(RNN(neurons, dropout=drop, implementation=impl))
+        model.add(RNN(neurons, recurrent_dropout=drop, implementation=impl))
 
     model.add(Dense(nclasses))
     model.add(Activation('softmax'))
