@@ -101,14 +101,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     model = keras.models.load_model('textgen.h5')
-    path = 'poetry4.txt.gz'
 
-    if sys.version_info.major == 3:
-        text = gzip.open(path, 'rt').read().lower().replace('\ufeff', ' ')
-    else:
-        text = gzip.open(path, 'rt').read().lower().decode('ascii', 'ignore').replace('\ufeff', ' ')
+    chars = [u'\n', u'\r', u' ', u'!', u'"', u"'", u',', u'.', u':', u';', u'?', u'a', u'b', u'c', u'd', u'e', u'f', u'g', u'h', u'i', u'j', u'k', u'l', u'm', u'n', u'o', u'p', u'q', u'r', u's', u't', u'u', u'v', u'w', u'x', u'y', u'z']
 
-    chars = sorted(list(set(text)))
     char_indices = dict((c, i) for i, c in enumerate(chars))
     indices_char = dict((i, c) for i, c in enumerate(chars))
 
