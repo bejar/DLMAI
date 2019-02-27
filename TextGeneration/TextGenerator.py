@@ -103,17 +103,19 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--verbose', help="Verbose output (enables Keras verbose output)", action='store_true', default=False)
     parser.add_argument('--gpu', help="Use LSTM/GRU gpu implementation", action='store_true', default=False)
+    parser.add_argument('--progress', help="Use LSTM/GRU gpu implementation", action='store_true', default=False)
+    parser.add_argument('--save', help="Use LSTM/GRU gpu implementation", action='store_true', default=False)
     args = parser.parse_args()
 
     verbose = 1 if args.verbose else 0
-    impl = 2 if args.gpu else 0
+    impl = 2 if args.gpu else 1
 
     print("Starting:", time.ctime())
 
     ############################################
     # Data
 
-    path = 'orig.txt.gz'
+    path = 'poetry1.txt.gz'
     text = gzip.open(path, 'rt').read().lower().replace('\ufeff', ' ')
     print('corpus length:', len(text))
 
@@ -197,6 +199,10 @@ if __name__ == '__main__':
             gfile.write('\n\n')
             gfile.write('DIV = %3.2f\n\n' % diversity)
             generate_text(seed, numlines=10, gfile=gfile, wseed=False)
+        if args.progress:
+            model.save(f"./textgen-{time.strftime('%Y%m%d%H%M%S')}.h5")
     gfile.close()
+    if args.save:
+        model.save(f"./textgen-{time.strftime('%Y%m%d%H%M%S')}.h5")
     print()
     print("Ending:", time.ctime())

@@ -15,7 +15,6 @@ WindPrediction
 
 """
 
-from __future__ import print_function
 import numpy as np
 
 from keras.models import Sequential, load_model
@@ -31,7 +30,6 @@ import argparse
 from time import time
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 __author__ = 'bejar'

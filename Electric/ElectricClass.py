@@ -34,7 +34,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     verbose = 1 if args.verbose else 0
-    impl = 2 if args.gpu else 0
+    impl = 2 if args.gpu else 1
 
     print("Starting:", time.ctime())
 

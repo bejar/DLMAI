@@ -17,7 +17,6 @@ GenPoetry
 
 """
 
-from __future__ import print_function
 import numpy as np
 import keras.models
 import random
