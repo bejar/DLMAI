@@ -62,11 +62,10 @@ class CharacterTable(object):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--verbose', help="Verbose output (enables Keras verbose output)", action='store_true', default=False)
-    parser.add_argument('--gpu', help="Use LSTM/GRU gopu implementation", action='store_true', default=False)
     args = parser.parse_args()
 
     verbose = 1 if args.verbose else 0
-    impl = 2 if args.gpu else 1
+    impl = 2
 
     print("Starting:", time.ctime())
 

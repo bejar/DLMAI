@@ -180,13 +180,12 @@ if __name__ == '__main__':
     parser.add_argument('--config', default='config', help='Experiment configuration')
     parser.add_argument('--verbose', help="Verbose output (enables Keras verbose output)", action='store_true',
                         default=False)
-    parser.add_argument('--gpu', help="Use LSTM/GRU gpu implementation", action='store_true', default=False)
     parser.add_argument('--best', help="Save weights best in test", action='store_true', default=False)
     parser.add_argument('--tboard', help="Save log for tensorboard", action='store_true', default=False)
     args = parser.parse_args()
 
     verbose = 1 if args.verbose else 0
-    impl = 2 if args.gpu else 1  # implementation 0 is deprecated for newer tensorflow versions
+    impl = 2
 
     config = load_config_file(args.config)
     ############################################

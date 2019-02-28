@@ -102,20 +102,31 @@ myseeds = ["behold the merry bride,\nwhite dress with yellow flowers,\nbright sm
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--verbose', help="Verbose output (enables Keras verbose output)", action='store_true', default=False)
-    parser.add_argument('--gpu', help="Use LSTM/GRU gpu implementation", action='store_true', default=False)
-    parser.add_argument('--progress', help="Use LSTM/GRU gpu implementation", action='store_true', default=False)
-    parser.add_argument('--save', help="Use LSTM/GRU gpu implementation", action='store_true', default=False)
+    parser.add_argument('--progress', help="Saves the weights of the model each iteration", action='store_true', default=False)
+    parser.add_argument('--save', help="Saves the last model", action='store_true', default=False)
+    parser.add_argument('--datafile', help="Number of the datafile to use [1,2,3,4]", type=int, default=1)
+    parser.add_argument('--iterations', help="Number of iterations to train", type=int, default=1)
+    parser.add_argument('--neurons', help="Number of neurons in the recurrent layers", type=int, default=256)
+    parser.add_argument('--layers', help="Number of layers", type=int, default=1)
+    parser.add_argument('--dropout', help="Recurrent dropout", type=float, default=0.0)
+    parser.add_argument('--exlen', help="Length of the examples", type=int, default=50)
+    parser.add_argument('--step', help="Step of the moving window for generating examples", type=int, default=3)
+
     args = parser.parse_args()
 
     verbose = 1 if args.verbose else 0
-    impl = 2 if args.gpu else 1
+    impl = 2
 
     print("Starting:", time.ctime())
 
     ############################################
     # Data
 
-    path = 'poetry1.txt.gz'
+    if args.datafile not in [1,2,3,4]:
+        raise NamedError('No such data file')
+    else:
+        path = f'poetry{args.datafile}.txt.gz'
+
     text = gzip.open(path, 'rt').read().lower().replace('\ufeff', ' ')
     print('corpus length:', len(text))
 
@@ -125,8 +136,8 @@ if __name__ == '__main__':
     indices_char = dict((i, c) for i, c in enumerate(chars))
 
     # cut the text in semi-redundant sequences of maxlen characters
-    maxlen = 50
-    step = 3
+    maxlen = args.exlen
+    step = args.step
     sentences = []
     next_chars = []
     for i in range(0, len(text) - maxlen, step):
@@ -145,14 +156,12 @@ if __name__ == '__main__':
 
     ############################################
     # Model
-
-    # Change the implementation parameter of the LSTM to 0 for CPU and 2 for GPU
     print('Build model...')
 
     RNN = LSTM  # GRU
-    lsize = 64
-    nlayers = 1
-    dropout = 0
+    lsize = args.neurons
+    nlayers = args.layers
+    dropout = args.dropout
 
     model = Sequential()
     if nlayers == 1:
@@ -169,21 +178,21 @@ if __name__ == '__main__':
     ############################################
     # Training
     # optimizer = RMSprop(lr=0.01)
-    optimizer = SGD(lr=0.05, momentum=0.95)
+    #optimizer = SGD(lr=0.05, momentum=0.95)
     model.compile(loss='categorical_crossentropy', optimizer="adam")
 
-    bsize = 256
-    iterations = 10
+    bsize = 2048
+    iterations = args.iterations
     epoch_it = 10
 
     # File for saving the generated text each iteration
-    gfile = open('tgenerated-TXT%s-ML%d-S%d-NL%d-D%3.2f-BS%d.txt' % (path.split()[0], maxlen, lsize, nlayers, dropout, bsize), 'w')
+    gfile = open('tgenerated-F%s-ML%d-S%d-NL%d-D%3.2f-BS%d.txt' % (path.split('.')[0], maxlen, lsize, nlayers, dropout, bsize), 'w')
 
     # train the model, output generated text after each iteration
     for iteration in range(iterations):
         print()
         print('-' * 50)
-        print('Iteration %d' %(iteration + 1))
+        print('Iteration %d - %s' %((iteration + 1), time.ctime()))
         model.fit(X, y,
                   batch_size=bsize,
                   epochs=epoch_it,
@@ -193,7 +202,7 @@ if __name__ == '__main__':
         gfile.write('\n')
         gfile.write(time.ctime())
         gfile.write('\n')
-        gfile.write('Iteration %d\n' % (iteration + 1))
+        gfile.write('Iteration %d n' % (iteration + 1))
         seed = random_seed(chars, maxlen)
         for diversity in [0.2, 0.4, 0.8, 1.0]:
             gfile.write('\n\n')

@@ -6,7 +6,7 @@ GenPoetry
 
 :Description: GenPoetry
 
-    
+    Generates a random poem given a model trained with TextGenerator.py
 
 :Authors: bejar
     
@@ -42,9 +42,9 @@ def sample(preds, temperature=1.0):
     probas = np.random.multinomial(1, preds, 1)
     return np.argmax(probas)
 
-def generate_text(seed, numlines, wseed=False):
+def generate_text(seed, numlines):
     """
-    Generates a number of lines (or at most 1000 characters) using the given seed
+    Generates a number of lines (or at most numlines * 50 characters) using the given seed
     :param seed:
     :param lines:
     :return:
@@ -55,7 +55,7 @@ def generate_text(seed, numlines, wseed=False):
     generated += sentence
 
     nlines = 0
-    for i in range(5000):
+    for i in range(numlines * 50):
         x = np.zeros((1, maxlen, len(chars)))
         for t, char in enumerate(sentence):
             x[0, t, char_indices[char]] = 1.
@@ -64,8 +64,7 @@ def generate_text(seed, numlines, wseed=False):
         next_index = sample(preds, diversity)
         next_char = indices_char[next_index]
         generated += next_char
-        gprinted += next_char
-
+        print(next_char, end='', flush=True)
         sentence = sentence[1:] + next_char
         # Count the number of lines generated
         if next_char == '\n':
@@ -73,10 +72,6 @@ def generate_text(seed, numlines, wseed=False):
         if nlines > numlines:
             break
 
-    if wseed:
-        print(seed + gprinted)
-    else:
-        print(gprinted)
     print('\n')
 
 
@@ -96,42 +91,26 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--diversity', help="Diversity for the samplig", default=0.4, type=float)
     parser.add_argument('--lines', help="Lines of text to generate", default=10, type=int)
-    parser.add_argument('--random', help="Random seed as input", action='store_true', default=False)
+    parser.add_argument('--model', help="model to use", default='textgen')
     args = parser.parse_args()
 
-    model = keras.models.load_model('textgen.h5')
+    if '.h5' not in  args.model:
+        args.model+='.h5'
+    model = keras.models.load_model(f'{args.model}')
 
-    chars = [u'\n', u'\r', u' ', u'!', u'"', u"'", u',', u'.', u':', u';', u'?', u'a', u'b', u'c', u'd', u'e', u'f', u'g', u'h', u'i', u'j', u'k', u'l', u'm', u'n', u'o', u'p', u'q', u'r', u's', u't', u'u', u'v', u'w', u'x', u'y', u'z']
+    chars =  ['\n', ' ', '!', '"', "'", ',', '.', ':', ';', '?', 'a', 'b', 'c', 'd', 'e',
+              'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+              'u', 'v', 'w', 'x', 'y', 'z', '‘']
 
     char_indices = dict((c, i) for i, c in enumerate(chars))
     indices_char = dict((i, c) for i, c in enumerate(chars))
 
-    maxlen = 100
+
+    maxlen = model.layers[0].input_shape[1]
     diversity = float(args.diversity)
     seed = str(random_seed(chars, maxlen))
-    if not args.random:
-        if sys.version_info.major == 3:
-            iseed = input('Seed: ')
-        else:
-            iseed = raw_input('Seed: ')
-        iseed = iseed.lower()
-        nseed = ''
-        if len(iseed) >= maxlen:
-            off = len(iseed) - maxlen
-            for i in range(maxlen):
-                nseed += iseed[i + off]
-        else:
-            off = maxlen - len(iseed)
-            for i in range(maxlen):
-                if i < off:
-                    nseed += seed[i]
-                else:
-                    nseed += iseed[i - off]
-
-        seed = nseed
-
 
     print('Generating poem')
     print('*'*20)
     print()
-    generate_text(seed, numlines=args.lines, wseed=True)
+    generate_text(seed, numlines=args.lines)
