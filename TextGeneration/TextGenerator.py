@@ -209,9 +209,9 @@ if __name__ == '__main__':
             gfile.write('DIV = %3.2f\n\n' % diversity)
             generate_text(seed, numlines=10, gfile=gfile, wseed=False)
         if args.progress:
-            model.save(f"./textgen-{time.strftime('%Y%m%d%H%M%S')}.h5")
+            model.save(f"./textgen-T{args.datafile}-N{lsize}-L{nlayers}-D{dropout}-{time.strftime('%Y%m%d%H%M%S')}.h5")
     gfile.close()
     if args.save:
-        model.save(f"./textgen-{time.strftime('%Y%m%d%H%M%S')}.h5")
+        model.save(f"./textgen-T{args.datafile}-N{lsize}-L{nlayers}-D{dropout}-{time.strftime('%Y%m%d%H%M%S')}.h5")
     print()
     print("Ending:", time.ctime())
