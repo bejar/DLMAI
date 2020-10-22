@@ -21,7 +21,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Activation, Embedding
 from tensorflow.keras.layers import LSTM
 from tensorflow.keras.optimizers import RMSprop, SGD
-from tensorflow.keras.utils import np_utils
+from tensorflow.keras.utils import to_categorical
 from collections import Counter
 import argparse
 import time
@@ -146,8 +146,8 @@ if __name__ == '__main__':
     epochs = 50
     batch_size = 100
 
-    train_y_c = np_utils.to_categorical(train_y, 3)
-    val_y_c = np_utils.to_categorical(val_y, 3)
+    train_y_c = to_categorical(train_y, 3)
+    val_y_c = to_categorical(val_y, 3)
 
     model.fit(train_x, train_y_c,
               batch_size=batch_size,
@@ -158,7 +158,7 @@ if __name__ == '__main__':
     ############################################
     # Results
 
-    test_y_c = np_utils.to_categorical(test_y, 3)
+    test_y_c = to_categorical(test_y, 3)
     score, acc = model.evaluate(test_x, test_y_c,
                                 batch_size=batch_size,
                                 verbose=verbose)

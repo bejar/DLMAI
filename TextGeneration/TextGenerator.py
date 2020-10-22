@@ -123,7 +123,7 @@ if __name__ == '__main__':
     # Data
 
     if args.datafile not in [1,2,3,4]:
-        raise NamedError('No such data file')
+        raise NameError('No such data file')
     else:
         path = f'poetry{args.datafile}.txt.gz'
 

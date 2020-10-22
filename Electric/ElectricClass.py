@@ -22,7 +22,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Activation
 from tensorflow.keras.layers import LSTM
 from tensorflow.keras.optimizers import RMSprop, SGD
-from tensorflow.keras.utils import np_utils
+from tensorflow.keras.utils import to_categorical
 from sklearn.metrics import confusion_matrix, classification_report
 import argparse
 import time
@@ -47,14 +47,14 @@ if __name__ == '__main__':
     train_y = train[:, 0] - 1
     # print(np.unique(train_y))
     nclasses = len(np.unique(train_y))
-    train_y_c = np_utils.to_categorical(train_y, nclasses)
+    train_y_c = to_categorical(train_y, nclasses)
     test = np.loadtxt('ElectricDevices_TEST.csv', delimiter=',')
 
     print(test.shape)
     test_x = test[:, 1:]
     test_x = np.reshape(test_x, (test_x.shape[0], test_x.shape[1], 1))
     test_y = test[:, 0] - 1
-    test_y_c = np_utils.to_categorical(test_y, nclasses)
+    test_y_c = to_categorical(test_y, nclasses)
 
     ############################################
     # Model

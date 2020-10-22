@@ -243,6 +243,8 @@ if __name__ == '__main__':
         mcheck = ModelCheckpoint(filepath=modfile, monitor='val_loss', verbose=0, save_best_only=True,
                                  save_weights_only=False, mode='auto', period=1)
         cbacks.append(mcheck)
+    else:
+        modfile= ''
 
     model.fit(train_x, train_y, batch_size=config['training']['batch'],
               epochs=config['training']['epochs'],
@@ -286,5 +288,5 @@ if __name__ == '__main__':
     # Deletes the model file
     try:
         os.remove(modfile)
-    except OSError:
+    except OSError as error:
         pass
