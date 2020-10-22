@@ -16,15 +16,16 @@ GenPoetry
 :Created on: 09/10/2017 7:21 
 
 """
+import os
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import numpy as np
 import keras.models
 import random
-import gzip
 import argparse
-import sys
 
 __author__ = 'bejar'
+
 
 def sample(preds, temperature=1.0):
     """
@@ -41,6 +42,7 @@ def sample(preds, temperature=1.0):
     preds = exp_preds / np.sum(exp_preds)
     probas = np.random.multinomial(1, preds, 1)
     return np.argmax(probas)
+
 
 def generate_text(seed, numlines):
     """
@@ -87,6 +89,7 @@ def random_seed(chars, nchars):
 
     return s
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--diversity', help="Diversity for the samplig", default=0.4, type=float)
@@ -94,23 +97,22 @@ if __name__ == '__main__':
     parser.add_argument('--model', help="model to use", default='textgen')
     args = parser.parse_args()
 
-    if '.h5' not in  args.model:
-        args.model+='.h5'
+    if '.h5' not in args.model:
+        args.model += '.h5'
     model = keras.models.load_model(f'{args.model}')
 
-    chars =  ['\n', ' ', '!', '"', "'", ',', '.', ':', ';', '?', 'a', 'b', 'c', 'd', 'e',
-              'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-              'u', 'v', 'w', 'x', 'y', 'z', '‘']
+    chars = ['\n', ' ', '!', '"', "'", ',', '.', ':', ';', '?', 'a', 'b', 'c', 'd', 'e',
+             'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+             'u', 'v', 'w', 'x', 'y', 'z', '‘']
 
     char_indices = dict((c, i) for i, c in enumerate(chars))
     indices_char = dict((i, c) for i, c in enumerate(chars))
-
 
     maxlen = model.layers[0].input_shape[1]
     diversity = float(args.diversity)
     seed = str(random_seed(chars, maxlen))
 
     print('Generating poem')
-    print('*'*20)
+    print('*' * 20)
     print()
     generate_text(seed, numlines=args.lines)

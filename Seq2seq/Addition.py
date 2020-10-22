@@ -18,7 +18,9 @@ Four digits inverted:
 Five digits inverted:
 + One layer LSTM (128 HN), 550k training examples = 99% train/test accuracy in 30 epochs
 """
+import os
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from tensorflow.keras.models import Sequential
 from tensorflow.keras import layers
 import numpy as np
@@ -33,6 +35,7 @@ class CharacterTable(object):
     + Decode the one hot integer representation to their character output
     + Decode a vector of probabilities to their character output
     """
+
     def __init__(self, chars):
         """Initialize character table.
         # Arguments
@@ -61,7 +64,8 @@ class CharacterTable(object):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--verbose', help="Verbose output (enables Keras verbose output)", action='store_true', default=False)
+    parser.add_argument('--verbose', help="Verbose output (enables Keras verbose output)", action='store_true',
+                        default=False)
     args = parser.parse_args()
 
     verbose = 1 if args.verbose else 0
@@ -91,7 +95,7 @@ if __name__ == '__main__':
     print('Generating data...')
     while len(questions) < TRAINING_SIZE:
         f = lambda: int(''.join(np.random.choice(list('0123456789'))
-                        for i in range(np.random.randint(1, DIGITS + 1))))
+                                for i in range(np.random.randint(1, DIGITS + 1))))
         a, b = f(), f()
         # Skip any addition questions we've already seen
         # Also skip any such that x+Y == Y+x (hence the sorting).

@@ -17,15 +17,18 @@ Process
 
 """
 
-import numpy as np
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Activation
-from tensorflow.keras.layers import LSTM
-from tensorflow.keras.optimizers import RMSprop, SGD
-from tensorflow.keras.utils import to_categorical
-from sklearn.metrics import confusion_matrix, classification_report
 import argparse
 import time
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+import numpy as np
+from sklearn.metrics import confusion_matrix, classification_report
+from tensorflow.keras.layers import Dense, Activation
+from tensorflow.keras.layers import LSTM
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.optimizers import SGD
+from tensorflow.keras.utils import to_categorical
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

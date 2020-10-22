@@ -12,7 +12,9 @@ SentimentTwAir
 :Created on: 07/09/2017 9:05 
 
 """
+import os
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import pandas
 from sklearn.metrics import confusion_matrix, classification_report
 import re
@@ -20,7 +22,7 @@ import numpy as np
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Activation, Embedding
 from tensorflow.keras.layers import LSTM
-from tensorflow.keras.optimizers import RMSprop, SGD
+from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.utils import to_categorical
 from collections import Counter
 import argparse
@@ -42,7 +44,8 @@ def tweet_to_words(raw_tweet):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--verbose', help="Verbose output (enables Keras verbose output)", action='store_true', default=False)
+    parser.add_argument('--verbose', help="Verbose output (enables Keras verbose output)", action='store_true',
+                        default=False)
     args = parser.parse_args()
 
     verbose = 1 if args.verbose else 0
@@ -54,7 +57,7 @@ if __name__ == '__main__':
     # Data
 
     Tweet = pandas.read_csv("Airlines.csv")
-#    Tweet = pandas.read_csv("Presidential.csv")
+    #    Tweet = pandas.read_csv("Presidential.csv")
 
     # Pre-process the tweet and store in a separate column
     Tweet['clean_tweet'] = Tweet['text'].apply(lambda x: tweet_to_words(x))
@@ -169,11 +172,11 @@ if __name__ == '__main__':
 
     print()
     print('Confusion Matrix')
-    print('-'*20)
+    print('-' * 20)
     print(confusion_matrix(test_y, test_pred))
     print()
     print('Classification Report')
-    print('-'*40)
+    print('-' * 40)
     print(classification_report(test_y, test_pred))
     print()
     print("Ending:", time.ctime())

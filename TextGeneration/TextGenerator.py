@@ -16,16 +16,17 @@ TextGenerator
 :Created on: 06/09/2017 9:26 
 
 """
-
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Activation
 from tensorflow.keras.layers import LSTM
-from tensorflow.keras.optimizers import RMSprop, SGD
 import numpy as np
 import random
 import gzip
 import argparse
 import time
+
 
 def sample(preds, temperature=1.0):
     """
@@ -101,8 +102,10 @@ myseeds = ["behold the merry bride,\nwhite dress with yellow flowers,\nbright sm
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--verbose', help="Verbose output (enables Keras verbose output)", action='store_true', default=False)
-    parser.add_argument('--progress', help="Saves the weights of the model each iteration", action='store_true', default=False)
+    parser.add_argument('--verbose', help="Verbose output (enables Keras verbose output)", action='store_true',
+                        default=False)
+    parser.add_argument('--progress', help="Saves the weights of the model each iteration", action='store_true',
+                        default=False)
     parser.add_argument('--save', help="Saves the last model", action='store_true', default=False)
     parser.add_argument('--datafile', help="Number of the datafile to use [1,2,3,4]", type=int, default=1)
     parser.add_argument('--iterations', help="Number of iterations to train", type=int, default=1)
@@ -122,7 +125,7 @@ if __name__ == '__main__':
     ############################################
     # Data
 
-    if args.datafile not in [1,2,3,4]:
+    if args.datafile not in [1, 2, 3, 4]:
         raise NameError('No such data file')
     else:
         path = f'poetry{args.datafile}.txt.gz'
@@ -168,7 +171,8 @@ if __name__ == '__main__':
         model.add(RNN(lsize, input_shape=(maxlen, len(chars)), implementation=impl, recurrent_dropout=dropout))
     else:
         model.add(
-            RNN(lsize, input_shape=(maxlen, len(chars)), implementation=impl, recurrent_dropout=dropout, return_sequences=True))
+            RNN(lsize, input_shape=(maxlen, len(chars)), implementation=impl, recurrent_dropout=dropout,
+                return_sequences=True))
         for i in range(1, nlayers - 1):
             model.add(RNN(lsize, implementation=impl, recurrent_dropout=dropout, return_sequences=True))
         model.add(RNN(lsize, implementation=impl, recurrent_dropout=dropout))
@@ -178,7 +182,7 @@ if __name__ == '__main__':
     ############################################
     # Training
     # optimizer = RMSprop(lr=0.01)
-    #optimizer = SGD(lr=0.05, momentum=0.95)
+    # optimizer = SGD(lr=0.05, momentum=0.95)
     model.compile(loss='categorical_crossentropy', optimizer="adam")
 
     bsize = 2048
@@ -186,13 +190,15 @@ if __name__ == '__main__':
     epoch_it = 10
 
     # File for saving the generated text each iteration
-    gfile = open('tgenerated-F%s-ML%d-S%d-NL%d-D%3.2f-BS%d.txt' % (path.split('.')[0], maxlen, lsize, nlayers, dropout, bsize), 'w')
+    gfile = open(
+        'tgenerated-F%s-ML%d-S%d-NL%d-D%3.2f-BS%d.txt' % (path.split('.')[0], maxlen, lsize, nlayers, dropout, bsize),
+        'w')
 
     # train the model, output generated text after each iteration
     for iteration in range(iterations):
         print()
         print('-' * 50)
-        print('Iteration %d - %s' %((iteration + 1), time.ctime()))
+        print('Iteration %d - %s' % ((iteration + 1), time.ctime()))
         model.fit(X, y,
                   batch_size=bsize,
                   epochs=epoch_it,

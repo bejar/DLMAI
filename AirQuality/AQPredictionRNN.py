@@ -15,22 +15,20 @@ WindPrediction
 
 """
 
-import numpy as np
-
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import LSTM, GRU
 from tensorflow.keras.optimizers import RMSprop
 from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint
 from sklearn.metrics import mean_squared_error, r2_score
-import os
-import tensorflow as tf
+
 import json
 import argparse
 from time import time
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 __author__ = 'bejar'
 
