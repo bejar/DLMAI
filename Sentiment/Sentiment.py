@@ -17,11 +17,11 @@ import pandas
 from sklearn.metrics import confusion_matrix, classification_report
 import re
 import numpy as np
-from keras.models import Sequential
-from keras.layers import Dense, Activation, Embedding
-from keras.layers import LSTM
-from keras.optimizers import RMSprop, SGD
-from keras.utils import np_utils
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Activation, Embedding
+from tensorflow.keras.layers import LSTM
+from tensorflow.keras.optimizers import RMSprop, SGD
+from tensorflow.keras.utils import np_utils
 from collections import Counter
 import argparse
 import time

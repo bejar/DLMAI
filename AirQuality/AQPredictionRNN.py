@@ -17,11 +17,11 @@ WindPrediction
 
 import numpy as np
 
-from keras.models import Sequential, load_model
-from keras.layers import Dense
-from keras.layers import LSTM, GRU
-from keras.optimizers import RMSprop
-from keras.callbacks import TensorBoard, ModelCheckpoint
+from tensorflow.keras.models import Sequential, load_model
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import LSTM, GRU
+from tensorflow.keras.optimizers import RMSprop
+from tensorflow.keras.callbacks import TensorBoard, ModelCheckpoint
 from sklearn.metrics import mean_squared_error, r2_score
 import os
 import tensorflow as tf

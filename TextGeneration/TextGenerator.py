@@ -17,10 +17,10 @@ TextGenerator
 
 """
 
-from keras.models import Sequential
-from keras.layers import Dense, Activation
-from keras.layers import LSTM
-from keras.optimizers import RMSprop, SGD
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Activation
+from tensorflow.keras.layers import LSTM
+from tensorflow.keras.optimizers import RMSprop, SGD
 import numpy as np
 import random
 import gzip

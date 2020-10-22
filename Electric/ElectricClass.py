@@ -18,11 +18,11 @@ Process
 """
 
 import numpy as np
-from keras.models import Sequential
-from keras.layers import Dense, Activation
-from keras.layers import LSTM
-from keras.optimizers import RMSprop, SGD
-from keras.utils import np_utils
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Activation
+from tensorflow.keras.layers import LSTM
+from tensorflow.keras.optimizers import RMSprop, SGD
+from tensorflow.keras.utils import np_utils
 from sklearn.metrics import confusion_matrix, classification_report
 import argparse
 import time
